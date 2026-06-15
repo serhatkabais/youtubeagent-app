@@ -160,6 +160,36 @@ st.markdown("""
         border-radius: 0;
         border: 1px solid #111111;
     }
+    
+    /* Tab Styling and Second Tab Pulse Highlight */
+    button[data-baseweb="tab"] {
+        font-family: 'Playfair Display', serif !important;
+        font-size: 1.05rem !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    /* Highlight the second tab */
+    button[data-baseweb="tab"]:nth-child(2) {
+        border-left: 2px solid #8B0000 !important;
+        border-right: 2px solid #8B0000 !important;
+        background-color: #FFF2F2 !important;
+        color: #8B0000 !important;
+        font-weight: bold !important;
+        border-radius: 4px 4px 0 0 !important;
+        box-shadow: 0 -2px 10px rgba(139, 0, 0, 0.1) !important;
+        animation: pulseTab 3s infinite alternate !important;
+    }
+    
+    @keyframes pulseTab {
+        0% {
+            background-color: #FFF2F2;
+            box-shadow: 0 -2px 5px rgba(139, 0, 0, 0.1);
+        }
+        100% {
+            background-color: #FFE0E0;
+            box-shadow: 0 -2px 15px rgba(139, 0, 0, 0.3);
+        }
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -337,7 +367,7 @@ st.markdown("<div class='sub-title'>Sanal İzleyici Topluluklarındaki Jargon, D
 # Sekmelerin Oluşturulması
 tab_intro, tab_analiz, tab_loglar = st.tabs([
     "🏠 Ana Sayfa", 
-    "📊 İzleyici Topluluğu & Yorum Analizi", 
+    "⚡ 📊 İzleyici Topluluğu & Analiz Paneli", 
     "🪵 Ajan İşlem Günlüğü (Logs)"
 ])
 
@@ -367,6 +397,16 @@ with tab_intro:
 
 # ----------------- TAB 2: ANALİZ VE GÖRSELLEŞTİRME -----------------
 with tab_analiz:
+    # Ajan Analiz Kılavuzu Kartı (Belirginleştirme)
+    st.markdown("""
+    <div class='premium-card' style='border-left: 5px solid #8B0000; background-color: #FFFBFB; padding: 1.2rem; margin-bottom: 1.5rem;'>
+        <h3 style='margin: 0 0 8px 0; color: #8B0000; font-family: "Playfair Display", serif;'>⚡ Analiz İşlemini Buradan Başlatın</h3>
+        <p style='margin: 0; font-size: 0.95rem; color: #333333; line-height: 1.5;'>
+            Aşağıdaki panelden bir <b>Yapay Zekâ Sağlayıcısı / Yöntemi</b> seçip modelinizi belirledikten sonra 
+            <b>"🚀 Yorumları Çek ve Etnografik Analizleri Yap"</b> butonuna basarak dijital etnografi analizini başlatabilirsiniz.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
     st.markdown("<h2 class='agent-header'>📊 İzleyici Topluluğu ve Yorum Analiz Paneli</h2>", unsafe_allow_html=True)
     st.write("")
     
