@@ -1,0 +1,58 @@
+[
+  {
+    "id": 1,
+    "username": "user_11298a3e",
+    "video_title": "n8n ile Yapay Zeka Ajanı Tasarlamak",
+    "comment": "n8n kullanarak şirket içindeki mailleri otomatik okuyup tasnif eden bir yapay zeka ajanı kurdum. Junior yazılımcıların yapacağı saatler süren işleri artık saniyeler içinde çözüyoruz.",
+    "likes": 33
+  },
+  {
+    "id": 2,
+    "username": "user_5de8536f",
+    "video_title": "Claude 3.5 Sonnet ve n8n Entegrasyonu",
+    "comment": "Hocam Claude API entegrasyonu yaparken webhook tetiklenmiyor. 'Connection Refused' hatası alıyorum. Docker port ayarlarında mı bir sorun var acaba?",
+    "likes": 8
+  },
+  {
+    "id": 3,
+    "username": "user_2afc61bf",
+    "video_title": "Claude 3.5 Sonnet ve n8n Entegrasyonu",
+    "comment": "@[kullanici_maskelendi] Eğer docker container kullanıyorsan localhost yerine `host.docker.internal` kullanmayı dene. Docker kendi içindeki localhost'u dışarıya kapatıyor.",
+    "likes": 21
+  },
+  {
+    "id": 4,
+    "username": "user_231775ea",
+    "video_title": "n8n ile Yapay Zeka Ajanı Tasarlamak",
+    "comment": "Öğrenci sınav sonuçlarını Google Sheets'ten okuyup, yapay zekaya kişiye özel geribildirim yazdıran ve mail atan bir akış tasarladım sayenizde. Harika bir dijital öğretmen asistanı oldu.",
+    "likes": 15
+  },
+  {
+    "id": 5,
+    "username": "user_4eb21327",
+    "video_title": "OpenAI API Fiyatlandırması ve Token Yönetimi",
+    "comment": "Ajanları çalıştırmak çok güzel ama token maliyetleri bir süre sonra can sıkmaya başlıyor. Özellikle RAG projelerinde büyük dökümanlar tarandığında fatura şişiyor. Yerel modeller (Ollama/Llama3) ile n8n entegrasyonu bekliyoruz.",
+    "likes": 48
+  },
+  {
+    "id": 6,
+    "username": "user_d6ddbf11",
+    "video_title": "OpenClaw Ajan Framework Kurulum Rehberi",
+    "comment": "Hiç kod yazmadan bu seviyede bir karar alan ajan kurabilmek mucize gibi. Yazılımcılık kavramı tamamen mantıksal iş akışı tasarlamaya (workflow design) evriliyor.",
+    "likes": 27
+  },
+  {
+    "id": 7,
+    "username": "user_6604d13b",
+    "video_title": "Google Colab ile LLM İnce Ayar (Fine-Tuning)",
+    "comment": "Hocam paylaştığınız Colab notebook'undaki kütüphaneler güncellendiği için kodlar hata veriyor. Gerekli kütüphaneleri dondurarak (pip install x==1.2) güncelleyebilir misiniz?",
+    "likes": 11
+  },
+  {
+    "id": 8,
+    "username": "user_74c8e9ea",
+    "video_title": "Eğitimde Yapay Zekâ Ajanlarının Rolü",
+    "comment": "Bu ajanların eğitimde kullanımı harika bir vizyon. Ancak öğrencilerin kendi bilişsel çabalarını tamamen bu sistemlere devretmesi zihinsel tembellik yaratabilir. Pedagojik denge çok iyi kurulmalı.",
+    "likes": 19
+  }
+]

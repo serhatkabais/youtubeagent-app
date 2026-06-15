@@ -1,0 +1,58 @@
+[
+  {
+    "id": 1,
+    "username": "user_8f6ab984",
+    "video_title": "Midjourney v6 ile Sıfırdan İllüstrasyon Tasarımı",
+    "comment": "Gerçekten inanılmaz bir kalite. Ancak bir illüstratör olarak içimde hafif bir korku oluşmuyor değil. Tasarımcılık mesleği 5-10 yıla tamamen yapay zekaya devredilecek gibi görünüyor.",
+    "likes": 42
+  },
+  {
+    "id": 2,
+    "username": "user_fbe98501",
+    "video_title": "Runway Gen-2 ile Yapay Zekadan Video Üretmek",
+    "comment": "Adobe Premiere kullanıyorum ama Runway'i kurgu iş akışıma dahil etmeyi denedim. Özellikle arka plan temizleme ve hızlı B-roll üretme konularında inanılmaz zaman kazandırıyor. Harika rehber!",
+    "likes": 18
+  },
+  {
+    "id": 3,
+    "username": "user_1b952ead",
+    "video_title": "Midjourney v6 ile Sıfırdan İllüstrasyon Tasarımı",
+    "comment": "Hocam v6 sürümünde --ar parametresini yazınca hata alıyorum, boyutları bir türlü değiştiremedim. Yardımcı olabilecek birisi var mı?",
+    "likes": 3
+  },
+  {
+    "id": 4,
+    "username": "user_99db3b1d",
+    "video_title": "Midjourney v6 ile Sıfırdan İllüstrasyon Tasarımı",
+    "comment": "@[kullanici_maskelendi] Dostum parametreden önce çift tire koyduğuna emin ol. Yani `--ar 16:9` şeklinde yazman gerekiyor. Boşluklara ve tire sayısına dikkat et.",
+    "likes": 12
+  },
+  {
+    "id": 5,
+    "username": "user_6057b78e",
+    "video_title": "Yapay Zeka Sanatı ve Telif Hakkı Sorunları",
+    "comment": "Sanatçıların emeklerinin izinsiz taranıp bu modellerin eğitilmesi etik dışı. Yapay zekaya tamamen karşı değilim ama sanatçı hakları korunmalı.",
+    "likes": 55
+  },
+  {
+    "id": 6,
+    "username": "user_9037aa67",
+    "video_title": "Mobil Cihazlarda Yapay Zeka ile Video Kurgusu",
+    "comment": "Mobil kurguda CapCut'ın AI ses temizleme aracı inanılmaz iyi çalışıyor. Dış çekimlerdeki rüzgar sesini tek tuşla sildim, herkese tavsiye ederim.",
+    "likes": 29
+  },
+  {
+    "id": 7,
+    "username": "user_757286a5",
+    "video_title": "Runway Gen-2 ile Yapay Zekadan Video Üretmek",
+    "comment": "Videodaki araçları denedim ama ücretsiz üyelikte kredi hemen bitiyor. Öğrenciler için alternatif ücretsiz hangi araçları önerirsiniz?",
+    "likes": 5
+  },
+  {
+    "id": 8,
+    "username": "user_b682bcbf",
+    "video_title": "Yapay Zeka ve Sinemanın Geleceği",
+    "comment": "Sora çıktığında yönetmenliğin tanımı değişecek. Artık bütçesi olmayan genç yönetmenler de devasa sahneleri bilgisayar başında üretebilecek. Bu demokratikleşme harika!",
+    "likes": 74
+  }
+]

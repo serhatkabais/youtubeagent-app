@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+.env
+
+# Streamlit
+.streamlit/
+config.toml
+
+# Project Specifics
+Cumali_Hoca_Final_Teslim.zip
+proje_raporu.pdf
+final_agent_raporu.pdf
+final_agent_raporu_kodlarla.pdf
+test_print.html
