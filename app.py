@@ -397,18 +397,18 @@ with tab_intro:
 
 # ----------------- TAB 2: ANALİZ VE GÖRSELLEŞTİRME -----------------
 with tab_analiz:
-    # Ajan Analiz Kılavuzu Kartı (Belirginleştirme)
+    st.markdown("<h2 class='agent-header'>🤖 İzleyici Topluluğu Analiz ve Karar Destek Ajanı</h2>", unsafe_allow_html=True)
+    st.write("")
+    
+    # Ajan Kontrol Paneli Rehberi (Kılavuz)
     st.markdown("""
-    <div class='premium-card' style='border-left: 5px solid #8B0000; background-color: #FFFBFB; padding: 1.2rem; margin-bottom: 1.5rem;'>
-        <h3 style='margin: 0 0 8px 0; color: #8B0000; font-family: "Playfair Display", serif;'>⚡ Analiz İşlemini Buradan Başlatın</h3>
-        <p style='margin: 0; font-size: 0.95rem; color: #333333; line-height: 1.5;'>
-            Aşağıdaki panelden bir <b>Yapay Zekâ Sağlayıcısı / Yöntemi</b> seçip modelinizi belirledikten sonra 
-            <b>"🚀 Yorumları Çek ve Etnografik Analizleri Yap"</b> butonuna basarak dijital etnografi analizini başlatabilirsiniz.
+    <div class='premium-card' style='border-left: 5px solid #8B0000; background-color: #FFF9F9; padding: 1rem; margin-bottom: 1.5rem;'>
+        <h4 style='margin: 0 0 5px 0; color: #8B0000; font-family: "Playfair Display", serif;'>⚡ Ajan Kontrol Merkezi</h4>
+        <p style='margin: 0; font-size: 0.92rem; color: #333333;'>
+            Analiz edilecek YouTube videosunu sol sütundan girin/seçin; API sağlayıcısını ve modelini sağ sütundan seçerek alttaki büyük kırmızı butona basın.
         </p>
     </div>
     """, unsafe_allow_html=True)
-    st.markdown("<h2 class='agent-header'>📊 İzleyici Topluluğu ve Yorum Analiz Paneli</h2>", unsafe_allow_html=True)
-    st.write("")
     
     # İlk açılışta varsayılan örnek videoyu otomatik yükle
     if not st.session_state.default_loaded and st.session_state.video_id == DEFAULT_VIDEO_ID and st.session_state.video_metadata is None:
@@ -417,22 +417,22 @@ with tab_analiz:
             st.session_state.video_metadata = meta
             st.session_state.video_id = DEFAULT_VIDEO_ID
             st.session_state.default_loaded = True
+
+    # İki Sütunlu Grid Layout
+    col_left, col_right = st.columns([1, 1], gap="large")
     
-    # "Yeni Video Analiz Et" butonu
-    if st.button("🎬 Yeni Bir Video Yorumu Analiz Et", use_container_width=True, type="secondary"):
-        st.session_state.show_new_video_input = not st.session_state.show_new_video_input
-    
-    # Yeni video giriş alanı (butona basıldığında açılır)
-    if st.session_state.show_new_video_input:
-        st.markdown("### 🔗 YouTube Video Bağlantısı")
-        col_input1, col_input2 = st.columns([3, 1])
-        with col_input1:
-            youtube_url = st.text_input("YouTube Video URL veya Video ID girin:", placeholder="Örn: https://www.youtube.com/watch?v=HK6y8DAPN_0", key="yt_url_input")
-        with col_input2:
-            st.write("##")
-            btn_get_meta = st.button("🔍 Video Künyesini Getir", use_container_width=True)
+    with col_left:
+        st.markdown("### 📺 1. Hedef YouTube Videosu")
         
-        # URL girildiyse veya butona tıklandıysa künyeyi çek
+        # YouTube URL veya ID girişi (Her zaman görünür, gizli değil)
+        youtube_url = st.text_input(
+            "YouTube Video URL veya Video ID:", 
+            value=f"https://www.youtube.com/watch?v={st.session_state.video_id}" if len(st.session_state.video_id) == 11 else st.session_state.video_id,
+            placeholder="Örn: https://www.youtube.com/watch?v=HK6y8DAPN_0"
+        )
+        
+        btn_get_meta = st.button("🔍 Video Künyesini Çek ve Yükle", use_container_width=True)
+        
         if (youtube_url and btn_get_meta) or btn_get_meta:
             if youtube_url:
                 video_id_match = re.search(r'(?:v=|\/)([0-9A-Za-z_-]{11}).*', youtube_url)
@@ -442,31 +442,24 @@ with tab_analiz:
                     meta = video_kunyesi_uret(video_id)
                     st.session_state.video_metadata = meta
                     st.session_state.video_id = video_id
-                    # Yeni videoda eski yorumları ve analizleri sıfırla
                     st.session_state.comments_data = []
                     st.session_state.analysis_result = None
                     st.session_state.comment_index = 0
-                    st.session_state.show_new_video_input = False
                     st.rerun()
 
-    
-    # Künye var ise göster ve yorum indirme seçeneğini aç
-    if st.session_state.video_metadata:
-        meta = st.session_state.video_metadata
-        st.markdown("---")
-        st.markdown("### 📺 Video Künyesi")
-        
-        col_meta1, col_meta2 = st.columns([1, 2])
-        with col_meta1:
+        # Künye Gösterim Kartı
+        if st.session_state.video_metadata:
+            meta = st.session_state.video_metadata
+            st.markdown("<div class='premium-card' style='padding: 1.2rem; margin-top: 1rem;'>", unsafe_allow_html=True)
             st.image(meta["thumbnail"], use_container_width=True)
-        with col_meta2:
-            st.markdown(f"#### [{meta['title']}]({meta['url']})")
-            st.markdown(f"👤 **Yayınlayan Kanal:** `{meta['uploader']}`")
-            st.markdown(f"📅 **Yayın Tarihi:** `{meta.get('upload_date', 'Bilinmiyor')}`")
-            st.markdown(f"👀 **İzlenme Sayısı:** `{meta['views']}` | 👍 **Beğeni Sayısı:** `{meta.get('likes', 'Bilinmiyor')}` | 💬 **Toplam Yorum:** `{meta.get('comment_count', 'Bilinmiyor')}`")
+            st.markdown(f"**[{meta['title']}]({meta['url']})**")
+            st.markdown(f"👤 Kanal: `{meta['uploader']}`")
+            st.markdown(f"👀 İzlenme: `{meta['views']}` | 👍 Beğeni: `{meta.get('likes', 'Bilinmiyor')}`")
+            st.markdown(f"💬 Toplam Yorum: `{meta.get('comment_count', 'Bilinmiyor')}`")
+            st.markdown("</div>", unsafe_allow_html=True)
             
-        st.markdown("---")
-        st.markdown("### ⚙️ Analiz Modeli ve Yöntemi Seçimi (Zorunlu)")
+    with col_right:
+        st.markdown("### ⚙️ 2. Ajan Modeli & Analiz Ayarları")
         
         provider_selection = st.selectbox(
             "Analiz Yapılacak Yapay Zekâ Sağlayıcısı / Yöntemi:",
@@ -482,7 +475,6 @@ with tab_analiz:
             selected_api_info = None
             btn_disabled = False
         else:
-            # API Sağlayıcıları
             prov_map = {
                 "Groq API": ("groq", groq_key, groq_formatted),
                 "OpenRouter": ("openrouter", or_key, or_formatted),
@@ -491,7 +483,7 @@ with tab_analiz:
             provider_code, selected_key, provider_models = prov_map[provider_selection]
             
             if not selected_key or selected_key.startswith("your_") or len(selected_key.strip()) <= 10:
-                st.error(f"❌ {provider_selection} seçildi ancak sistemde geçerli bir API anahtarı yapılandırılmamış. Lütfen `.env` dosyanızı kontrol edin veya sol menüden anahtar durumuna bakın.")
+                st.error(f"❌ {provider_selection} seçildi ancak sistemde geçerli bir API anahtarı yapılandırılmamış. Lütfen sol menüden anahtar durumuna bakın.")
             else:
                 model_options = provider_models + ["Özel Model Gir (Custom)..."]
                 selected_model_choice = st.selectbox(f"Kullanılacak Yapay Zekâ Modeli ({provider_selection}):", options=model_options)
@@ -511,26 +503,35 @@ with tab_analiz:
                         "model": model_value
                     }
                     btn_disabled = False
+                    
+        st.markdown("---")
+        st.markdown("**📥 Yorum İndirme ve Örneklem Seçenekleri**")
+        download_mode = st.radio("İndirme Modu:", ["Tüm Yorumlar (Maksimum 500 Yorum)", "Özel Sayıda Yorum Limiti (Rastgele Örneklem)"], label_visibility="collapsed")
+        custom_count = st.number_input("İndirilecek/Örnekleme Alınacak Yorum Sayısı:", min_value=5, max_value=500, value=30, disabled=(download_mode == "Tüm Yorumlar (Maksimum 500 Yorum)"))
         
-        st.markdown("### 📥 Yorum İndirme ve Örneklem Seçenekleri")
+        st.markdown("---")
+        # Kırmızı ve belirgin primary buton CSS'i
+        st.markdown("""
+        <style>
+        div.stButton > button[kind="primary"] {
+            background-color: #8B0000 !important;
+            color: #FFFFFF !important;
+            border: 2px solid #8B0000 !important;
+            box-shadow: 0 4px 15px rgba(139, 0, 0, 0.4) !important;
+            font-size: 1.1rem !important;
+            font-weight: 700 !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
         
-        col_dl1, col_dl2 = st.columns([1, 1])
-        with col_dl1:
-            download_mode = st.radio("İndirme Modu:", ["Tüm Yorumlar (Maksimum 500 Yorum)", "Özel Sayıda Yorum Limiti (Rastgele Örneklem)"])
-        with col_dl2:
-            custom_count = st.number_input("İndirilecek/Örnekleme Alınacak Yorum Sayısı:", min_value=5, max_value=500, value=30, disabled=(download_mode == "Tüm Yorumlar (Maksimum 500 Yorum)"))
-            
         if st.button("🚀 Yorumları Çek ve Etnografik Analizleri Yap", type="primary", use_container_width=True, disabled=btn_disabled):
             with st.spinner("Yorumlar indiriliyor ve anonimleştiriliyor..."):
-                # Yorumları çek
-                limit = 500 if download_mode.startswith("Tüm Yorumlar") else 500 # Havuzu geniş tutuyoruz
+                limit = 500
                 raw_comments = download_live_comments(st.session_state.video_id, limit)
                 
                 if raw_comments:
-                    # Rastgele örnekleme
                     if not download_mode.startswith("Tüm Yorumlar") and len(raw_comments) > custom_count:
                         selected_comments = random.sample(raw_comments, custom_count)
-                        # Sıralamayı (ID) yeniden düzenle
                         for idx, c in enumerate(selected_comments):
                             c["id"] = idx + 1
                     else:
@@ -539,7 +540,6 @@ with tab_analiz:
                     st.session_state.comments_data = selected_comments
                     st.session_state.comment_index = 0
                     
-                    # Analiz Et (Seçilen modeli aktar)
                     try:
                         progress_bar = st.progress(0.0, text="Yapay zekâ yorumları analiz ediyor...")
                         def update_progress(val):
