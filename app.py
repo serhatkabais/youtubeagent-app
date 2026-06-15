@@ -168,26 +168,32 @@ st.markdown("""
         transition: all 0.3s ease !important;
     }
     
-    /* Highlight the second tab */
+    /* Highlight the second tab with an intense flashing/blinking alert effect */
     button[data-baseweb="tab"]:nth-child(2) {
-        border-left: 2px solid #8B0000 !important;
-        border-right: 2px solid #8B0000 !important;
-        background-color: #FFF2F2 !important;
-        color: #8B0000 !important;
-        font-weight: bold !important;
-        border-radius: 4px 4px 0 0 !important;
-        box-shadow: 0 -2px 10px rgba(139, 0, 0, 0.1) !important;
-        animation: pulseTab 3s infinite alternate !important;
+        border: 2px solid #8B0000 !important;
+        border-radius: 6px !important;
+        font-weight: 800 !important;
+        box-shadow: 0 0 10px rgba(139, 0, 0, 0.2) !important;
+        animation: intenseBlink 1.2s infinite alternate !important;
     }
     
-    @keyframes pulseTab {
+    @keyframes intenseBlink {
         0% {
-            background-color: #FFF2F2;
-            box-shadow: 0 -2px 5px rgba(139, 0, 0, 0.1);
+            background-color: #FFF2F2 !important;
+            color: #8B0000 !important;
+            box-shadow: 0 0 5px rgba(139, 0, 0, 0.2) !important;
+            transform: scale(1);
+        }
+        50% {
+            background-color: #FFD2D2 !important;
+            color: #D32F2F !important;
+            box-shadow: 0 0 15px rgba(139, 0, 0, 0.6) !important;
         }
         100% {
-            background-color: #FFE0E0;
-            box-shadow: 0 -2px 15px rgba(139, 0, 0, 0.3);
+            background-color: #FF8A8A !important; /* Flash red background */
+            color: #FFFFFF !important; /* White text on red background */
+            box-shadow: 0 0 25px rgba(255, 0, 0, 0.8) !important;
+            transform: scale(1.03);
         }
     }
 </style>
@@ -367,7 +373,7 @@ st.markdown("<div class='sub-title'>Sanal İzleyici Topluluklarındaki Jargon, D
 # Sekmelerin Oluşturulması
 tab_intro, tab_analiz, tab_loglar = st.tabs([
     "🏠 Ana Sayfa", 
-    "⚡ 📊 İzleyici Topluluğu & Analiz Paneli", 
+    "🔴 📊 ANALİZ PANELİ (Buradan Başlatın) 👈", 
     "🪵 Ajan İşlem Günlüğü (Logs)"
 ])
 
