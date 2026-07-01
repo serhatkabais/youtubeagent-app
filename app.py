@@ -318,19 +318,33 @@ api_provider_selection = st.sidebar.selectbox(
 
 # Model Listesi Tanımları
 MODELS_MAP = {
-    "Groq API": groq_formatted,
-    "OpenRouter": or_formatted,
-    "Gemini API": gemini_formatted
+    "Groq API": (groq_formatted, ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768"]),
+    "OpenRouter": (or_formatted, ["meta-llama/llama-3.3-70b-instruct:free", "qwen/qwen-2.5-72b-instruct:free", "google/gemma-2-9b-it:free"]),
+    "Gemini API": (gemini_formatted, ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"])
 }
 
 selected_model_option = None
+consensus_mode = False
+
 if api_provider_selection != "Kural Tabanlı (Çevrimdışı Fallback)":
-    model_list = MODELS_MAP.get(api_provider_selection, []) + ["Özel Model Gir (Custom)..."]
-    model_choice = st.sidebar.selectbox("Kullanılacak Model Seçimi:", model_list)
-    if model_choice == "Özel Model Gir (Custom)...":
-        selected_model_option = st.sidebar.text_input("Özel Model Kodunu Girin (Örn: google/gemma-7b):")
+    provider_models, consensus_triplet = MODELS_MAP[api_provider_selection]
+    
+    consensus_mode = st.sidebar.checkbox(
+        "Çoklu LLM Mutabakat Analizi (Consensus Mode) 🎓",
+        value=False,
+        help="Bu mod aktif edildiğinde, aynı sağlayıcıya ait 3 farklı model paralel olarak çalıştırılır. Sınıflandırmalar çoğunluk oylaması ile belirlenir ve Fleiss' Kappa akademik güvenilirlik skorları hesaplanır."
+    )
+    
+    if consensus_mode:
+        st.sidebar.info(f"🤖 **Mutabakat model üçlüsü:**\n" + "\n".join([f"- `{m}`" for m in consensus_triplet]))
+        selected_model_option = consensus_triplet
     else:
-        selected_model_option = parse_selected_model(model_choice)
+        model_list = provider_models + ["Özel Model Gir (Custom)..."]
+        model_choice = st.sidebar.selectbox("Kullanılacak Model Seçimi:", model_list)
+        if model_choice == "Özel Model Gir (Custom)...":
+            selected_model_option = st.sidebar.text_input("Özel Model Kodunu Girin (Örn: google/gemma-7b):").strip()
+        else:
+            selected_model_option = parse_selected_model(model_choice)
 
 # Durumu State'e kaydet
 if "active_api" not in st.session_state:
@@ -349,14 +363,17 @@ if api_provider_selection != "Kural Tabanlı (Çevrimdışı Fallback)":
         if selected_key and not selected_key.startswith("your_") and len(selected_key.strip()) > 10:
             from api_client import test_api_connection
             with st.spinner("Bağlantı test ediliyor..."):
-                success, model_resolved, msg = test_api_connection(provider_code, selected_key, selected_model=selected_model_option)
+                test_model = selected_model_option[0] if consensus_mode else selected_model_option
+                success, model_resolved, msg = test_api_connection(provider_code, selected_key, selected_model=test_model)
                 if success:
                     st.session_state.active_api = {
                         "provider": provider_code,
                         "api_key": selected_key,
-                        "model": model_resolved
+                        "model": model_resolved if not consensus_mode else None,
+                        "models": selected_model_option if consensus_mode else None,
+                        "consensus_mode": consensus_mode
                     }
-                    st.sidebar.success(msg)
+                    st.sidebar.success(msg if not consensus_mode else f"Mutabakat Modu Testi Başarılı! Birincil model: {model_resolved}")
                 else:
                     st.session_state.active_api = None
                     st.sidebar.error(msg)
@@ -467,62 +484,43 @@ with tab_analiz:
     with col_right:
         st.markdown("### ⚙️ 2. Ajan Modeli & Analiz Ayarları")
         
-        provider_selection = st.selectbox(
-            "Analiz Yapılacak Yapay Zekâ Sağlayıcısı / Yöntemi:",
-            options=["-- Lütfen Bir Sağlayıcı Seçin --", "Kural Tabanlı Analiz (Çevrimdışı Fallback)", "Gemini API", "Groq API", "OpenRouter"]
-        )
-        
         selected_api_info = None
         btn_disabled = True
         
-        if provider_selection == "-- Lütfen Bir Sağlayıcı Seçin --":
-            st.warning("⚠️ Analizi başlatabilmek için lütfen yukarıdan bir sağlayıcı seçin.")
-        elif provider_selection == "Kural Tabanlı Analiz (Çevrimdışı Fallback)":
+        if api_provider_selection == "Kural Tabanlı (Çevrimdışı Fallback)":
+            st.info("ℹ️ **Aktif Mod:** Çevrimdışı Kural Tabanlı Analiz (Fallback)")
             selected_api_info = None
             btn_disabled = False
         else:
-            prov_map = {
-                "Groq API": ("groq", groq_key, groq_formatted, ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768"]),
-                "OpenRouter": ("openrouter", or_key, or_formatted, ["meta-llama/llama-3.3-70b-instruct:free", "qwen/qwen-2.5-72b-instruct:free", "google/gemma-2-9b-it:free"]),
-                "Gemini API": ("gemini", gemini_key, gemini_formatted, ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"])
-            }
-            provider_code, selected_key, provider_models, consensus_triplet = prov_map[provider_selection]
+            provider_code, selected_key = {
+                "Groq API": ("groq", groq_key),
+                "OpenRouter": ("openrouter", or_key),
+                "Gemini API": ("gemini", gemini_key)
+            }[api_provider_selection]
             
             if not selected_key or selected_key.startswith("your_") or len(selected_key.strip()) <= 10:
-                st.error(f"❌ {provider_selection} seçildi ancak sistemde geçerli bir API anahtarı yapılandırılmamış. Lütfen sol menüden anahtar durumuna bakın.")
+                st.error(f"❌ {api_provider_selection} seçildi ancak sistemde geçerli bir API anahtarı yapılandırılmamış. Lütfen sol menüden anahtar durumuna bakın.")
             else:
-                consensus_mode = st.checkbox(
-                    "Çoklu LLM Mutabakat Analizi (Consensus Mode) 🎓",
-                    value=False,
-                    help="Bu mod aktif edildiğinde, aynı sağlayıcıya ait 3 farklı model paralel olarak çalıştırılır. Sınıflandırmalar çoğunluk oylaması ile belirlenir ve Fleiss' Kappa akademik güvenilirlik skorları hesaplanır."
-                )
-                
                 if consensus_mode:
-                    st.info(f"🤖 **Mutabakat için kullanılacak model üçlüsü:**\n" + "\n".join([f"- `{m}`" for m in consensus_triplet]))
+                    st.success(f"🎓 **Çoklu LLM Mutabakat Modu Aktif ({api_provider_selection})**")
+                    st.info("Mutabakat Modelleri:\n" + "\n".join([f"- `{m}`" for m in selected_model_option]))
                     selected_api_info = {
                         "provider": provider_code,
                         "api_key": selected_key,
-                        "models": consensus_triplet,
+                        "models": selected_model_option,
                         "consensus_mode": True
                     }
                     btn_disabled = False
                 else:
-                    model_options = provider_models + ["Özel Model Gir (Custom)..."]
-                    selected_model_choice = st.selectbox(f"Kullanılacak Yapay Zekâ Modeli ({provider_selection}):", options=model_options)
-                    
-                    model_value = ""
-                    if selected_model_choice == "Özel Model Gir (Custom)...":
-                        model_value = st.text_input("Özel Model Kodunu Girin (Örn: google/gemma-7b):").strip()
+                    if not selected_model_option:
+                        st.warning("⚠️ Lütfen sol menüden geçerli bir model seçin.")
                     else:
-                        model_value = parse_selected_model(selected_model_choice)
-                        
-                    if not model_value:
-                        st.warning("⚠️ Analizi başlatabilmek için lütfen bir model seçin veya özel model kodu girin.")
-                    else:
+                        st.success(f"🤖 **Tekil LLM Analiz Modu Aktif ({api_provider_selection})**")
+                        st.info(f"Model: `{selected_model_option}`")
                         selected_api_info = {
                             "provider": provider_code,
                             "api_key": selected_key,
-                            "model": model_value,
+                            "model": selected_model_option,
                             "consensus_mode": False
                         }
                         btn_disabled = False
