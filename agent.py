@@ -88,22 +88,30 @@ class IklimAynasiAgent:
         model_info = "Kural Tabanlı Analiz (Çevrimdışı Fallback)"
         llm_analysis_results = None
         
-        if api_info and api_info.get("api_key") and api_info.get("model"):
-            from api_client import get_llm_report, analyze_comments_with_llm
-            self.log_action("Nitel Raporlama", f"{api_info['provider']} ({api_info['model']}) üzerinden detaylı analiz başlıyor...")
+        if api_info and api_info.get("api_key") and (api_info.get("model") or api_info.get("models")):
+            from api_client import get_llm_report, analyze_comments_with_llm, analyze_comments_with_llm_consensus
             
             try:
-                # 1. LLM ile Yorum Analizi (Progress Callback alınabilir ama şimdilik pass)
-                # Not: İlerleme app.py üzerinden gösterilmek isteniyorsa progress argümanı eklenebilir.
-                # Şimdilik direkt çağırıyoruz
                 progress_cb = None
                 if "progress_callback" in api_info:
                     progress_cb = api_info["progress_callback"]
-                    
-                llm_analysis_results = analyze_comments_with_llm(
-                    yorumlar, api_info["provider"], api_info["api_key"], api_info["model"], progress_cb
-                )
-                
+
+                consensus_stats = None
+
+                if api_info.get("consensus_mode") and api_info.get("models"):
+                    models_list = api_info["models"]
+                    self.log_action("Nitel Raporlama (Mutabakat Modu)", f"{api_info['provider']} üzerinden {', '.join(models_list)} modelleri paralel çağrılıyor...")
+                    llm_analysis_results, consensus_stats = analyze_comments_with_llm_consensus(
+                        yorumlar, api_info["provider"], api_info["api_key"], models_list, progress_cb
+                    )
+                    model_info = f"{api_info['provider'].upper()} Çoklu LLM Mutabakat Modu ({', '.join(models_list)})"
+                else:
+                    self.log_action("Nitel Raporlama", f"{api_info['provider']} ({api_info['model']}) üzerinden detaylı analiz başlıyor...")
+                    llm_analysis_results = analyze_comments_with_llm(
+                        yorumlar, api_info["provider"], api_info["api_key"], api_info["model"], progress_cb
+                    )
+                    model_info = f"{api_info['provider'].upper()} API ({api_info['model']})"
+
                 # LLM sonuçlarına göre istatistikleri derle
                 total = len(yorumlar)
                 kaygi_sayisi = sum(1 for r in llm_analysis_results if r.get("category") in ["Mesleki Gelecek Kaygisi", "Felsefi/Varolussal Sorgulama", "Etik ve Telif Hassasiyeti"])
@@ -133,12 +141,14 @@ class IklimAynasiAgent:
                 
                 # 2. Sentez Raporunu Oluştur
                 self.log_action("Sentez Raporlama", "Analiz sonuçları birleştirilip rapor yazılıyor...")
+                
+                # Rapor üretirken mutabakat modunda birincil modeli kullanalım
+                primary_model = api_info["models"][0] if api_info.get("consensus_mode") else api_info["model"]
                 akademik_rapor = get_llm_report(
-                    meta, stats, yorumlar, api_info["provider"], api_info["api_key"], api_info["model"], llm_analysis_results
+                    meta, stats, yorumlar, api_info["provider"], api_info["api_key"], primary_model, llm_analysis_results
                 )
                 if not akademik_rapor:
                     raise Exception("Model boş rapor döndürdü.")
-                model_info = f"{api_info['provider'].upper()} API ({api_info['model']})"
                 
                 # LLM analizini geriye dönük arayüzle uyumlu hale getirmek için duygu/rol dict'lerini güncelle
                 duygu_sonuclari = {}
@@ -157,6 +167,7 @@ class IklimAynasiAgent:
             self.log_action("Araç Tetikleme", "izleyici_raporu_olusturucu() çağrılıyor (Çevrimdışı Mod)...")
             akademik_rapor = izleyici_raporu_olusturucu(duygu_sonuclari, rol_sonuclari, topluluk_turu)
             model_info = "Kural Tabanlı Analiz (Çevrimdışı Fallback)"
+            consensus_stats = None
             
         self.log_action("Analiz Tamamlandı", "Tüm analizler ve rapor başarıyla birleştirildi.")
         
@@ -167,7 +178,8 @@ class IklimAynasiAgent:
             "rol": rol_sonuclari,
             "rapor": akademik_rapor,
             "model_info": model_info,
-            "llm_results": llm_analysis_results
+            "llm_results": llm_analysis_results,
+            "consensus_stats": consensus_stats
         }
 
         

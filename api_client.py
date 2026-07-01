@@ -536,3 +536,181 @@ def get_available_openrouter_models(api_key):
     except Exception as e:
         print(f"Error fetching OpenRouter models: {e}")
     return []
+
+# ============================================================
+# MULTI-LLM MUTABAKAT VE AKADEMİK GÜVENİLİRLİK (FLEISS' KAPPA)
+# ============================================================
+
+from concurrent.futures import ThreadPoolExecutor
+
+def calculate_fleiss_kappa(ratings_matrix):
+    """
+    Fleiss' Kappa katsayısını hesaplar.
+    ratings_matrix: Her bir satırı gözlemci oyları olan liste. (Örn: [['pozitif', 'pozitif', 'negatif'], ...])
+    """
+    N = len(ratings_matrix)
+    if N == 0:
+        return 0.0
+    n = 3 # 3 rater/model
+    
+    # Tüm benzersiz kategorileri al
+    categories = list(set(val for row in ratings_matrix for val in row))
+    k = len(categories)
+    if k <= 1:
+        return 1.0 # Tek kategori varsa tam uyuşum
+        
+    counts = []
+    for row in ratings_matrix:
+        row_counts = {cat: 0 for cat in categories}
+        for val in row:
+            row_counts[val] += 1
+        counts.append(row_counts)
+        
+    P_i_list = []
+    for i in range(N):
+        sum_sq = sum(c**2 for c in counts[i].values())
+        P_i = (sum_sq - n) / (n * (n - 1))
+        P_i_list.append(P_i)
+        
+    P_mean = sum(P_i_list) / N
+    
+    p_j_list = []
+    for cat in categories:
+        sum_cat = sum(counts[i][cat] for i in range(N))
+        p_j = sum_cat / (N * n)
+        p_j_list.append(p_j)
+        
+    P_e = sum(p**2 for p in p_j_list)
+    
+    if P_e == 1.0:
+        return 0.0
+        
+    kappa = (P_mean - P_e) / (1.0 - P_e)
+    return kappa
+
+def interpret_kappa(kappa):
+    """Kappa skorunun akademik yorumunu döner."""
+    if kappa < 0:
+        return "Uyuşma Yok / Rastgele"
+    elif kappa <= 0.20:
+        return "Önemsiz Derecede Uyuşum (Slight Agreement)"
+    elif kappa <= 0.40:
+        return "Kabul Edilebilir Derecede Uyuşum (Fair Agreement)"
+    elif kappa <= 0.60:
+        return "Orta Derecede Uyuşum (Moderate Agreement)"
+    elif kappa <= 0.80:
+        return "Önemli Derecede Uyuşum (Substantial Agreement)"
+    else:
+        return "Neredeyse Mükemmel Uyuşum (Almost Perfect Agreement)"
+
+def _get_consensus_value(val1, val2, val3):
+    """En az 2 oy alan değeri ve kaç oy aldığını döner."""
+    from collections import Counter
+    counts = Counter([val1, val2, val3])
+    most_common = counts.most_common(1)[0]
+    if most_common[1] >= 2:
+        return most_common[0], most_common[1]
+    else:
+        return val1, 1 # uyuşmazlık durumunda birincil modelin tahmini, 1 oy
+
+def analyze_comments_with_llm_consensus(comments, provider, api_key, models, progress_callback=None):
+    """
+    3 farklı modelle yorumları paralel analiz eder ve çoğunluk kararına göre birleştirir.
+    models: list of 3 model names.
+    """
+    if len(models) < 3:
+        raise Exception("Mutabakat analizi için en az 3 model gereklidir.")
+
+    results = {}
+    progress_states = {models[0]: 0.0, models[1]: 0.0, models[2]: 0.0}
+    
+    def get_progress_wrapper(model_name):
+        def cb(progress):
+            progress_states[model_name] = progress
+            if progress_callback:
+                avg_progress = sum(progress_states.values()) / 3.0
+                progress_callback(avg_progress)
+        return cb
+
+    def run_analysis(model_name):
+        return analyze_comments_with_llm(
+            comments, provider, api_key, model_name, get_progress_wrapper(model_name)
+        )
+
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        futures = {executor.submit(run_analysis, m): m for m in models}
+        for future in futures:
+            model_name = futures[future]
+            try:
+                results[model_name] = future.result()
+            except Exception as e:
+                raise Exception(f"Model {model_name} analiz sırasında hata verdi: {str(e)}")
+
+    m1_results = results[models[0]]
+    m2_results = results[models[1]]
+    m3_results = results[models[2]]
+
+    consensus_results = []
+    ratings_sentiment = []
+    ratings_category = []
+    ratings_role = []
+
+    for i in range(len(comments)):
+        c1 = m1_results[i]
+        c2 = m2_results[i]
+        c3 = m3_results[i]
+
+        sent_val, sent_votes = _get_consensus_value(c1["sentiment"], c2["sentiment"], c3["sentiment"])
+        cat_val, cat_votes = _get_consensus_value(c1["category"], c2["category"], c3["category"])
+        role_val, role_votes = _get_consensus_value(c1["role"], c2["role"], c3["role"])
+
+        ratings_sentiment.append([c1["sentiment"], c2["sentiment"], c3["sentiment"]])
+        ratings_category.append([c1["category"], c2["category"], c3["category"]])
+        ratings_role.append([c1["role"], c2["role"], c3["role"]])
+
+        min_votes = min(sent_votes, cat_votes, role_votes)
+        if sent_votes == 3 and cat_votes == 3 and role_votes == 3:
+            agreement_level = "Tam Mutabakat"
+        elif min_votes == 1:
+            agreement_level = "Uyuşmazlık"
+        else:
+            agreement_level = "Çoğunluk Kararı"
+
+        consensus_results.append({
+            "original_id": c1["original_id"],
+            "original_comment": c1["original_comment"],
+            "sentiment": sent_val,
+            "emotion": c1.get("emotion", "belirsiz"),
+            "category": cat_val,
+            "role": role_val,
+            "rhetorical_devices": list(set(c1.get("rhetorical_devices", []) + c2.get("rhetorical_devices", []) + c3.get("rhetorical_devices", []))),
+            "confidence": round((sent_votes + cat_votes + role_votes) / 9.0, 2),
+            "reasoning": f"Modeller arası mutabakat: {agreement_level}. Birincil Model Gerekçesi: {c1.get('reasoning', '')}",
+            "consensus_details": {
+                "agreement_level": agreement_level,
+                "votes": {
+                    "sentiment": {models[0]: c1["sentiment"], models[1]: c2["sentiment"], models[2]: c3["sentiment"]},
+                    "category": {models[0]: c1["category"], models[1]: c2["category"], models[2]: c3["category"]},
+                    "role": {models[0]: c1["role"], models[1]: c2["role"], models[2]: c3["role"]}
+                }
+            }
+        })
+
+    kappa_sent = calculate_fleiss_kappa(ratings_sentiment)
+    kappa_cat = calculate_fleiss_kappa(ratings_category)
+    kappa_role = calculate_fleiss_kappa(ratings_role)
+
+    consensus_count = sum(1 for r in consensus_results if r["consensus_details"]["agreement_level"] in ["Tam Mutabakat", "Çoğunluk Kararı"])
+    consensus_rate = (consensus_count / len(comments)) * 100 if len(comments) > 0 else 0.0
+
+    stats = {
+        "fleiss_kappa_sentiment": round(kappa_sent, 3),
+        "fleiss_kappa_category": round(kappa_cat, 3),
+        "fleiss_kappa_role": round(kappa_role, 3),
+        "fleiss_kappa_sentiment_text": interpret_kappa(kappa_sent),
+        "fleiss_kappa_category_text": interpret_kappa(kappa_cat),
+        "fleiss_kappa_role_text": interpret_kappa(kappa_role),
+        "consensus_rate": round(consensus_rate, 1)
+    }
+
+    return consensus_results, stats

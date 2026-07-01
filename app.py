@@ -482,33 +482,50 @@ with tab_analiz:
             btn_disabled = False
         else:
             prov_map = {
-                "Groq API": ("groq", groq_key, groq_formatted),
-                "OpenRouter": ("openrouter", or_key, or_formatted),
-                "Gemini API": ("gemini", gemini_key, gemini_formatted)
+                "Groq API": ("groq", groq_key, groq_formatted, ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768"]),
+                "OpenRouter": ("openrouter", or_key, or_formatted, ["meta-llama/llama-3.3-70b-instruct:free", "qwen/qwen-2.5-72b-instruct:free", "google/gemma-2-9b-it:free"]),
+                "Gemini API": ("gemini", gemini_key, gemini_formatted, ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"])
             }
-            provider_code, selected_key, provider_models = prov_map[provider_selection]
+            provider_code, selected_key, provider_models, consensus_triplet = prov_map[provider_selection]
             
             if not selected_key or selected_key.startswith("your_") or len(selected_key.strip()) <= 10:
                 st.error(f"❌ {provider_selection} seçildi ancak sistemde geçerli bir API anahtarı yapılandırılmamış. Lütfen sol menüden anahtar durumuna bakın.")
             else:
-                model_options = provider_models + ["Özel Model Gir (Custom)..."]
-                selected_model_choice = st.selectbox(f"Kullanılacak Yapay Zekâ Modeli ({provider_selection}):", options=model_options)
+                consensus_mode = st.checkbox(
+                    "Çoklu LLM Mutabakat Analizi (Consensus Mode) 🎓",
+                    value=False,
+                    help="Bu mod aktif edildiğinde, aynı sağlayıcıya ait 3 farklı model paralel olarak çalıştırılır. Sınıflandırmalar çoğunluk oylaması ile belirlenir ve Fleiss' Kappa akademik güvenilirlik skorları hesaplanır."
+                )
                 
-                model_value = ""
-                if selected_model_choice == "Özel Model Gir (Custom)...":
-                    model_value = st.text_input("Özel Model Kodunu Girin (Örn: google/gemma-7b):").strip()
-                else:
-                    model_value = parse_selected_model(selected_model_choice)
-                    
-                if not model_value:
-                    st.warning("⚠️ Analizi başlatabilmek için lütfen bir model seçin veya özel model kodu girin.")
-                else:
+                if consensus_mode:
+                    st.info(f"🤖 **Mutabakat için kullanılacak model üçlüsü:**\n" + "\n".join([f"- `{m}`" for m in consensus_triplet]))
                     selected_api_info = {
                         "provider": provider_code,
                         "api_key": selected_key,
-                        "model": model_value
+                        "models": consensus_triplet,
+                        "consensus_mode": True
                     }
                     btn_disabled = False
+                else:
+                    model_options = provider_models + ["Özel Model Gir (Custom)..."]
+                    selected_model_choice = st.selectbox(f"Kullanılacak Yapay Zekâ Modeli ({provider_selection}):", options=model_options)
+                    
+                    model_value = ""
+                    if selected_model_choice == "Özel Model Gir (Custom)...":
+                        model_value = st.text_input("Özel Model Kodunu Girin (Örn: google/gemma-7b):").strip()
+                    else:
+                        model_value = parse_selected_model(selected_model_choice)
+                        
+                    if not model_value:
+                        st.warning("⚠️ Analizi başlatabilmek için lütfen bir model seçin veya özel model kodu girin.")
+                    else:
+                        selected_api_info = {
+                            "provider": provider_code,
+                            "api_key": selected_key,
+                            "model": model_value,
+                            "consensus_mode": False
+                        }
+                        btn_disabled = False
                     
         st.markdown("---")
         st.markdown("**📥 Yorum İndirme ve Örneklem Seçenekleri**")
@@ -577,6 +594,40 @@ with tab_analiz:
         # Analizde Hangi Modelin Kullanıldığını Göster (Kullanıcı Talebi)
         model_name = analysis.get("model_info", "Kural Tabanlı Analiz (Çevrimdışı)")
         st.info(f"**Kullanılan Analiz Modeli/Sistem:** {model_name}")
+        
+        # Mutabakat Raporu Akademik Güvenilirlik Kartı
+        if analysis.get("consensus_stats"):
+            c_stats = analysis["consensus_stats"]
+            st.markdown(f"""
+            <div class='premium-card' style='border-left: 5px solid #1A365D; background-color: #F0F4F8; padding: 1.5rem; margin-bottom: 1.5rem;'>
+                <h3 style='margin: 0 0 10px 0; color: #1A365D; font-family: "Playfair Display", serif;'>🎓 Akademik Güvenilirlik & Mutabakat İndeksi</h3>
+                <p style='margin: 0 0 15px 0; font-size: 0.95rem; color: #333333;'>
+                    Bu analiz, 3 farklı yapay zekâ modelinin paralel değerlendirmeleri karşılaştırılarak oluşturulmuştur. 
+                    Aşağıdaki metrikler, modeller arasındaki tutarlılığı (Güvenilirlik) akademik standartlarda (Fleiss' Kappa) göstermektedir.
+                </p>
+                <div style='display: flex; gap: 20px; flex-wrap: wrap;'>
+                    <div style='flex: 1; min-width: 180px; background: white; padding: 10px; border: 1px solid #D5CDB5;'>
+                        <span style='font-size:0.85rem; color:#666;'>Genel Mutabakat Oranı</span><br/>
+                        <span style='font-size:1.8rem; font-weight:bold; color:#1A365D;'>%{c_stats['consensus_rate']}</span>
+                    </div>
+                    <div style='flex: 1; min-width: 180px; background: white; padding: 10px; border: 1px solid #D5CDB5;'>
+                        <span style='font-size:0.85rem; color:#666;'>Duygu Analizi Kappa (κ)</span><br/>
+                        <span style='font-size:1.4rem; font-weight:bold; color:#2B6CB0;'>{c_stats['fleiss_kappa_sentiment']}</span><br/>
+                        <span style='font-size:0.75rem; color:#555;'>{c_stats['fleiss_kappa_sentiment_text']}</span>
+                    </div>
+                    <div style='flex: 1; min-width: 180px; background: white; padding: 10px; border: 1px solid #D5CDB5;'>
+                        <span style='font-size:0.85rem; color:#666;'>Kategori Sınıflandırma Kappa (κ)</span><br/>
+                        <span style='font-size:1.4rem; font-weight:bold; color:#2B6CB0;'>{c_stats['fleiss_kappa_category']}</span><br/>
+                        <span style='font-size:0.75rem; color:#555;'>{c_stats['fleiss_kappa_category_text']}</span>
+                    </div>
+                    <div style='flex: 1; min-width: 180px; background: white; padding: 10px; border: 1px solid #D5CDB5;'>
+                        <span style='font-size:0.85rem; color:#666;'>Rol Tespiti Kappa (κ)</span><br/>
+                        <span style='font-size:1.4rem; font-weight:bold; color:#2B6CB0;'>{c_stats['fleiss_kappa_role']}</span><br/>
+                        <span style='font-size:0.75rem; color:#555;'>{c_stats['fleiss_kappa_role_text']}</span>
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
         
         st.markdown(f"### Otomatik Saptanan Topluluk Türü: <span style='color:#8B0000;'>{analysis['topluluk_turu_str']}</span>", unsafe_allow_html=True)
         
@@ -670,8 +721,25 @@ with tab_analiz:
             
         if c_llm:
             st.markdown("---")
-            st.markdown(f"**LLM Analiz Detayları:**")
-            st.markdown(f"> *{c_reasoning}*")
+            if "consensus_details" in c_llm:
+                votes = c_llm["consensus_details"]["votes"]
+                agree_lvl = c_llm["consensus_details"]["agreement_level"]
+                lbl_color = "#8B0000" if agree_lvl == "Uyuşmazlık" else ("#2B6CB0" if agree_lvl == "Çoğunluk Kararı" else "#2E7D32")
+                
+                st.markdown(f"**Güven Derecesi (Mutabakat):** <span style='color:{lbl_color}; font-weight:bold;'>{agree_lvl} (Güven: {c_llm['confidence']})</span>", unsafe_allow_html=True)
+                
+                vote_table = []
+                for field in ["sentiment", "category", "role"]:
+                    row = {"Analiz Alanı": field.capitalize()}
+                    for model_name, val in votes[field].items():
+                        short_model = model_name.split("/")[-1] if "/" in model_name else model_name
+                        row[short_model] = val
+                    vote_table.append(row)
+                
+                st.dataframe(pd.DataFrame(vote_table).set_index("Analiz Alanı"), use_container_width=True)
+            else:
+                st.markdown(f"**LLM Analiz Detayları:**")
+                st.markdown(f"> *{c_reasoning}*")
             if c_devices:
                 st.markdown(f"**Saptanan Retorik:** `{'`, `'.join(c_devices)}`")
             
@@ -694,13 +762,29 @@ with tab_analiz:
             detailed_table = []
             for item in comments:
                 single_girdi = [item]
-                single_duygu = list(duygu_ve_kaygi_analizi(single_girdi, analysis["topluluk_turu"]).keys())[0]
-                single_rol = list(dijital_rol_dedektoru(single_girdi, analysis["topluluk_turu"]).keys())[0]
+                c_llm = next((r for r in llm_results if r.get("original_id") == item["id"]), None) if llm_results else None
+                
+                if c_llm:
+                    single_duygu = c_llm.get("sentiment")
+                    single_cat = c_llm.get("category")
+                    single_rol = c_llm.get("role")
+                    agree_lvl = c_llm.get("consensus_details", {}).get("agreement_level", "Tek LLM")
+                    conf = c_llm.get("confidence", 1.0)
+                else:
+                    single_duygu = list(duygu_ve_kaygi_analizi(single_girdi, analysis["topluluk_turu"]).keys())[0]
+                    single_cat = "Karma / Genel"
+                    single_rol = list(dijital_rol_dedektoru(single_girdi, analysis["topluluk_turu"]).keys())[0]
+                    agree_lvl = "Kural Tabanlı"
+                    conf = 1.0
+                    
                 detailed_table.append({
                     "Kullanıcı": item["username"],
                     "Yorum": item["comment"],
-                    "Saptanan Kategori": single_duygu,
+                    "Duygu": single_duygu,
+                    "Kategori": single_cat,
                     "Saptanan Rol": single_rol,
+                    "Mutabakat": agree_lvl,
+                    "Güven Skoru": conf,
                     "Beğeni": item.get("likes", 0)
                 })
             st.dataframe(pd.DataFrame(detailed_table), use_container_width=True)

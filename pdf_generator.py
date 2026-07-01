@@ -151,6 +151,14 @@ def generate_analysis_pdf(meta, analysis, comments):
     story.append(Paragraph("Siber-Kültürel İklim Özeti", h1_style))
     story.append(Paragraph(f"<b>Saptanan Topluluk İklim Türü:</b> {escape_html_for_pdf(analysis['topluluk_turu_str'])}", body_style))
     story.append(Paragraph(f"<b>Kullanılan Analiz Modeli:</b> {escape_html_for_pdf(analysis.get('model_info', 'Kural Tabanlı Analiz (Çevrimdışı)'))}", body_style))
+    
+    if analysis.get("consensus_stats"):
+        c_stats = analysis["consensus_stats"]
+        story.append(Paragraph("Akademik Güvenilirlik & Mutabakat Analizi", h1_style))
+        story.append(Paragraph(f"<b>Genel Mutabakat Oranı (Tutarlılık):</b> %{c_stats['consensus_rate']}", body_style))
+        story.append(Paragraph(f"<b>Fleiss' Kappa - Duygu Analizi:</b> {c_stats['fleiss_kappa_sentiment']} ({c_stats['fleiss_kappa_sentiment_text']})", body_style))
+        story.append(Paragraph(f"<b>Fleiss' Kappa - Kategori Sınıflandırma:</b> {c_stats['fleiss_kappa_category']} ({c_stats['fleiss_kappa_category_text']})", body_style))
+        story.append(Paragraph(f"<b>Fleiss' Kappa - Dijital Rol Tespiti:</b> {c_stats['fleiss_kappa_role']} ({c_stats['fleiss_kappa_role_text']})", body_style))
     story.append(Spacer(1, 5))
     
     # Grafiklerin oluşturulması ve PDF'e eklenmesi
@@ -215,10 +223,19 @@ def generate_analysis_pdf(meta, analysis, comments):
     ]
     
     from tools import duygu_ve_kaygi_analizi, dijital_rol_dedektoru
+    llm_results = analysis.get("llm_results")
     for c in comments[:20]: # Sayfa taşmasını önlemek için raporda ilk 20 yorumu gösteriyoruz
-        c_girdi = [c]
-        c_duygu = list(duygu_ve_kaygi_analizi(c_girdi, analysis["topluluk_turu"]).keys())[0]
-        c_rol = list(dijital_rol_dedektoru(c_girdi, analysis["topluluk_turu"]).keys())[0]
+        c_llm = next((r for r in llm_results if r.get("original_id") == c["id"]), None) if llm_results else None
+        
+        if c_llm:
+            c_duygu = c_llm.get("sentiment", "notr")
+            c_rol = c_llm.get("role", "Pasif Destekci")
+            c_cat = c_llm.get("category", "Genel Gozlem")
+        else:
+            c_girdi = [c]
+            c_duygu = list(duygu_ve_kaygi_analizi(c_girdi, analysis["topluluk_turu"]).keys())[0]
+            c_rol = list(dijital_rol_dedektoru(c_girdi, analysis["topluluk_turu"]).keys())[0]
+            c_cat = "Karma / Genel"
         
         # Yorum metnini kısalt (tabloya sığması için)
         c_text = c["comment"]
@@ -228,7 +245,7 @@ def generate_analysis_pdf(meta, analysis, comments):
         table_data.append([
             Paragraph(escape_html_for_pdf(c["username"]), body_style),
             Paragraph(escape_html_for_pdf(c_text), body_style),
-            Paragraph(escape_html_for_pdf(c_duygu), body_style),
+            Paragraph(escape_html_for_pdf(f"{c_cat} ({c_duygu})"), body_style),
             Paragraph(escape_html_for_pdf(c_rol), body_style)
         ])
         
