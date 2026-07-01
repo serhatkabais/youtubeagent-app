@@ -651,6 +651,17 @@ with tab_analiz:
         # Mutabakat Raporu Akademik Güvenilirlik Kartı
         if analysis.get("consensus_stats"):
             c_stats = analysis["consensus_stats"]
+            llm_results = analysis.get("llm_results", [])
+            total_comments = len(comments)
+            
+            tam_mutabakat_count = sum(1 for r in llm_results if r.get("consensus_details", {}).get("agreement_level") == "Tam Mutabakat")
+            cogunluk_count = sum(1 for r in llm_results if r.get("consensus_details", {}).get("agreement_level") == "Çoğunluk Kararı")
+            uyusmazlik_count = sum(1 for r in llm_results if r.get("consensus_details", {}).get("agreement_level") == "Uyuşmazlık")
+            
+            tam_pct = round((tam_mutabakat_count / total_comments) * 100, 1) if total_comments > 0 else 0.0
+            cogunluk_pct = round((cogunluk_count / total_comments) * 100, 1) if total_comments > 0 else 0.0
+            uyusmazlik_pct = round((uyusmazlik_count / total_comments) * 100, 1) if total_comments > 0 else 0.0
+
             st.markdown(f"""
             <div class='premium-card' style='border-left: 5px solid #1A365D; background-color: #F0F4F8; padding: 1.5rem; margin-bottom: 1.5rem;'>
                 <h3 style='margin: 0 0 10px 0; color: #1A365D; font-family: "Playfair Display", serif;'>🎓 Akademik Güvenilirlik & Mutabakat İndeksi</h3>
@@ -658,6 +669,12 @@ with tab_analiz:
                     Bu analiz, 3 farklı yapay zekâ modelinin paralel değerlendirmeleri karşılaştırılarak oluşturulmuştur. 
                     Aşağıdaki metrikler, modeller arasındaki tutarlılığı (Güvenilirlik) akademik standartlarda (Fleiss' Kappa) göstermektedir.
                 </p>
+                <div style='margin-bottom: 20px; font-size: 0.95rem; color: #111; background: white; padding: 12px; border: 1px solid #D5CDB5;'>
+                    <b>Değerlendirme Dağılım Özeti (N={total_comments} Yorum):</b><br/>
+                    - 🟢 <b>Tam Mutabakat (3/3):</b> {tam_mutabakat_count} yorum (%{tam_pct}) - <i>Tüm alanlarda 3 model de aynı kodlamayı yaptı.</i><br/>
+                    - 🔵 <b>Çoğunluk Kararı (2/3):</b> {cogunluk_count} yorum (%{cogunluk_pct}) - <i>Modeller arasında 2/3 oylama ile karar verildi.</i><br/>
+                    - 🔴 <b>Uyuşmazlık (1/3):</b> {uyusmazlik_count} yorum (%{uyusmazlik_pct}) - <i>3 model de farklı kodlamalar yaptı (Birincil model kararı uygulandı).</i>
+                </div>
                 <div style='display: flex; gap: 20px; flex-wrap: wrap;'>
                     <div style='flex: 1; min-width: 180px; background: white; padding: 10px; border: 1px solid #D5CDB5;'>
                         <span style='font-size:0.85rem; color:#666;'>Genel Mutabakat Oranı</span><br/>
@@ -686,7 +703,12 @@ with tab_analiz:
         
         editorial_colors = ["#8B0000", "#111111", "#444444", "#777777", "#A5A5A5", "#D5CDB5", "#EBEBEB"]
         
-        col_g1, col_g2 = st.columns(2)
+        if analysis.get("consensus_stats"):
+            col_g1, col_g2, col_g3 = st.columns(3)
+        else:
+            col_g1, col_g2 = st.columns(2)
+            col_g3 = None
+            
         with col_g1:
             st.markdown("#### Duygu ve Kaygı İklimi")
             duygu_df = pd.DataFrame(list(analysis["duygu"].items()), columns=["Kategori", "Sıklık"])
@@ -697,6 +719,18 @@ with tab_analiz:
             rol_df = pd.DataFrame(list(analysis["rol"].items()), columns=["Rol", "Sıklık"])
             fig_r = px.bar(rol_df, x="Rol", y="Sıklık", title="Dijital Rol Dağılımı", color="Rol", color_discrete_sequence=editorial_colors)
             st.plotly_chart(fig_r, use_container_width=True)
+        
+        if col_g3:
+            with col_g3:
+                st.markdown("#### Modeller Arası Mutabakat")
+                llm_results = analysis.get("llm_results", [])
+                levels = [r.get("consensus_details", {}).get("agreement_level", "Bilinmeyen") for r in llm_results]
+                from collections import Counter
+                level_counts = Counter(levels)
+                mutabakat_df = pd.DataFrame(list(level_counts.items()), columns=["Mutabakat Seviyesi", "Sıklık"])
+                mutabakat_colors = ["#2E7D32", "#1A365D", "#8B0000"]
+                fig_m = px.pie(mutabakat_df, values="Sıklık", names="Mutabakat Seviyesi", title="Mutabakat Dağılımı", color_discrete_sequence=mutabakat_colors)
+                st.plotly_chart(fig_m, use_container_width=True)
             
         st.markdown("---")
         st.markdown("<div class='premium-card'>", unsafe_allow_html=True)
