@@ -613,47 +613,56 @@ def _get_consensus_value(val1, val2, val3):
     else:
         return val1, 1 # uyuşmazlık durumunda birincil modelin tahmini, 1 oy
 
-def analyze_comments_with_llm_consensus(comments, provider, api_key, models, progress_callback=None):
+def analyze_comments_with_llm_consensus(comments, models_config, progress_callback=None):
     """
     3 farklı modelle yorumları paralel analiz eder ve çoğunluk kararına göre birleştirir.
-    models: list of 3 model names.
+    models_config: list of 3 dicts: [{'provider': '...', 'api_key': '...', 'model': '...'}, ...]
     """
-    if len(models) < 3:
+    if len(models_config) < 3:
         raise Exception("Mutabakat analizi için en az 3 model gereklidir.")
 
     results = {}
-    progress_states = {models[0]: 0.0, models[1]: 0.0, models[2]: 0.0}
+    progress_states = {"Model_1": 0.0, "Model_2": 0.0, "Model_3": 0.0}
     
-    def get_progress_wrapper(model_name):
+    def get_progress_wrapper(model_idx_str):
         def cb(progress):
-            progress_states[model_name] = progress
+            progress_states[model_idx_str] = progress
             if progress_callback:
                 avg_progress = sum(progress_states.values()) / 3.0
                 progress_callback(avg_progress)
         return cb
 
-    def run_analysis(model_name):
+    def run_analysis(idx, cfg):
         return analyze_comments_with_llm(
-            comments, provider, api_key, model_name, get_progress_wrapper(model_name)
+            comments, cfg["provider"], cfg["api_key"], cfg["model"], get_progress_wrapper(f"Model_{idx+1}")
         )
 
     with ThreadPoolExecutor(max_workers=3) as executor:
-        futures = {executor.submit(run_analysis, m): m for m in models}
+        futures = {executor.submit(run_analysis, i, cfg): i for i, cfg in enumerate(models_config)}
         for future in futures:
-            model_name = futures[future]
+            idx = futures[future]
+            model_name = models_config[idx]["model"]
             try:
-                results[model_name] = future.result()
+                results[f"Model_{idx+1}"] = future.result()
             except Exception as e:
-                raise Exception(f"Model {model_name} analiz sırasında hata verdi: {str(e)}")
+                raise Exception(f"Model {model_name} (Sıra {idx+1}) analiz sırasında hata verdi: {str(e)}")
 
-    m1_results = results[models[0]]
-    m2_results = results[models[1]]
-    m3_results = results[models[2]]
+    m1_results = results["Model_1"]
+    m2_results = results["Model_2"]
+    m3_results = results["Model_3"]
 
     consensus_results = []
     ratings_sentiment = []
     ratings_category = []
     ratings_role = []
+
+    m1_name = models_config[0]["model"]
+    m2_name = models_config[1]["model"]
+    m3_name = models_config[2]["model"]
+    
+    lbl1 = f"Model_1 ({m1_name.split('/')[-1]})"
+    lbl2 = f"Model_2 ({m2_name.split('/')[-1]})"
+    lbl3 = f"Model_3 ({m3_name.split('/')[-1]})"
 
     for i in range(len(comments)):
         c1 = m1_results[i]
@@ -685,13 +694,13 @@ def analyze_comments_with_llm_consensus(comments, provider, api_key, models, pro
             "role": role_val,
             "rhetorical_devices": list(set(c1.get("rhetorical_devices", []) + c2.get("rhetorical_devices", []) + c3.get("rhetorical_devices", []))),
             "confidence": round((sent_votes + cat_votes + role_votes) / 9.0, 2),
-            "reasoning": f"Modeller arası mutabakat: {agreement_level}. Birincil Model Gerekçesi: {c1.get('reasoning', '')}",
+            "reasoning": f"Modeller arası mutabakat: {agreement_level}. Model 1 Gerekçesi: {c1.get('reasoning', '')}",
             "consensus_details": {
                 "agreement_level": agreement_level,
                 "votes": {
-                    "sentiment": {models[0]: c1["sentiment"], models[1]: c2["sentiment"], models[2]: c3["sentiment"]},
-                    "category": {models[0]: c1["category"], models[1]: c2["category"], models[2]: c3["category"]},
-                    "role": {models[0]: c1["role"], models[1]: c2["role"], models[2]: c3["role"]}
+                    "sentiment": {lbl1: c1["sentiment"], lbl2: c2["sentiment"], lbl3: c3["sentiment"]},
+                    "category": {lbl1: c1["category"], lbl2: c2["category"], lbl3: c3["category"]},
+                    "role": {lbl1: c1["role"], lbl2: c2["role"], lbl3: c3["role"]}
                 }
             }
         })

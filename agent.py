@@ -98,13 +98,14 @@ class IklimAynasiAgent:
 
                 consensus_stats = None
 
-                if api_info.get("consensus_mode") and api_info.get("models"):
-                    models_list = api_info["models"]
-                    self.log_action("Nitel Raporlama (Mutabakat Modu)", f"{api_info['provider']} üzerinden {', '.join(models_list)} modelleri paralel çağrılıyor...")
+                if api_info.get("consensus_mode") and api_info.get("models_config"):
+                    models_config = api_info["models_config"]
+                    models_names = [cfg["model"] for cfg in models_config]
+                    self.log_action("Nitel Raporlama (Mutabakat Modu)", f"Paralel modeller çağrılıyor: {', '.join(models_names)}")
                     llm_analysis_results, consensus_stats = analyze_comments_with_llm_consensus(
-                        yorumlar, api_info["provider"], api_info["api_key"], models_list, progress_cb
+                        yorumlar, models_config, progress_cb
                     )
-                    model_info = f"{api_info['provider'].upper()} Çoklu LLM Mutabakat Modu ({', '.join(models_list)})"
+                    model_info = f"Çoklu LLM Mutabakat Modu ({', '.join(models_names)})"
                 else:
                     self.log_action("Nitel Raporlama", f"{api_info['provider']} ({api_info['model']}) üzerinden detaylı analiz başlıyor...")
                     llm_analysis_results = analyze_comments_with_llm(
@@ -143,9 +144,17 @@ class IklimAynasiAgent:
                 self.log_action("Sentez Raporlama", "Analiz sonuçları birleştirilip rapor yazılıyor...")
                 
                 # Rapor üretirken mutabakat modunda birincil modeli kullanalım
-                primary_model = api_info["models"][0] if api_info.get("consensus_mode") else api_info["model"]
+                if api_info.get("consensus_mode"):
+                    primary_model = api_info["models_config"][0]["model"]
+                    report_provider = api_info["models_config"][0]["provider"]
+                    report_key = api_info["models_config"][0]["api_key"]
+                else:
+                    primary_model = api_info["model"]
+                    report_provider = api_info["provider"]
+                    report_key = api_info["api_key"]
+                
                 akademik_rapor = get_llm_report(
-                    meta, stats, yorumlar, api_info["provider"], api_info["api_key"], primary_model, llm_analysis_results
+                    meta, stats, yorumlar, report_provider, report_key, primary_model, llm_analysis_results
                 )
                 if not akademik_rapor:
                     raise Exception("Model boş rapor döndürdü.")
