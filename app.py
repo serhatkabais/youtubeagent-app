@@ -225,30 +225,27 @@ if "default_loaded" not in st.session_state:
     st.session_state.default_loaded = False
 
 # Sidebar: Ajan Bilgileri ve Tanımı
-st.sidebar.markdown(f"### Ajan Kimliği")
-st.sidebar.markdown(f"**Ajan Rolü:**\n`{agent.role}`")
-st.sidebar.markdown("**Sistem Talimatı:**")
-st.sidebar.caption(agent.system_instructions)
-
-st.sidebar.divider()
-st.sidebar.markdown("### Tez Bağlamı")
-st.sidebar.info(
-    "Bu çalışma, çevrimiçi/gayriresmi izleyici topluluklarındaki iklimi, jargonları ve "
-    "izleyici kimliklerini inceleyerek içerik üreticilerine ve araştırmacılara veri tabanlı "
-    "öneriler sunan bir karar destek aracıdır."
-)
-
-st.sidebar.divider()
-st.sidebar.markdown("### Gözetim ve Etik Sınır")
-st.sidebar.markdown(
-    "<div class='ethical-warning'>"
-    "<b>Uyarı:</b> Ajan çıktıları kesin yargılar barındırmaz. "
-    "Eğitim tasarım kararları verilirken insan (öğretmen/araştırmacı) gözetimi zorunludur."
-    "</div>", 
-    unsafe_allow_html=True
-)
-
-st.sidebar.divider()
+with st.sidebar.expander("ℹ️ Ajan Tanımı ve Akademik Bağlam", expanded=False):
+    st.markdown(f"### Ajan Kimliği")
+    st.markdown(f"**Ajan Rolü:**\n`{agent.role}`")
+    st.markdown("**Sistem Talimatı:**")
+    st.caption(agent.system_instructions)
+    st.divider()
+    st.markdown("### Tez Bağlamı")
+    st.info(
+        "Bu çalışma, çevrimiçi/gayriresmi izleyici topluluklarındaki iklimi, jargonları ve "
+        "izleyici kimliklerini inceleyerek içerik üreticilerine ve araştırmacılara veri tabanlı "
+        "öneriler sunan bir karar destek aracıdır."
+    )
+    st.divider()
+    st.markdown("### Gözetim ve Etik Sınır")
+    st.markdown(
+        "<div class='ethical-warning'>"
+        "<b>Uyarı:</b> Ajan çıktıları kesin yargılar barındırmaz. "
+        "Eğitim tasarım kararları verilirken insan (öğretmen/araştırmacı) gözetimi zorunludur."
+        "</div>", 
+        unsafe_allow_html=True
+    )
 st.sidebar.markdown("### 🔌 Yapay Zekâ API Ayarları")
 
 # .env'den anahtarları oku
