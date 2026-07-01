@@ -307,12 +307,6 @@ if gemini_key and not gemini_key.startswith("your_") and len(gemini_key.strip())
 else:
     st.sidebar.markdown("- **Gemini API:** 🔴 `Yapılandırılmadı`")
 
-# Sağlayıcı Seçimi
-api_provider_selection = st.sidebar.selectbox(
-    "Aktif Analiz Sağlayıcısı:",
-    ["Groq API", "OpenRouter", "Gemini API"]
-)
-
 # Model Listesi Tanımları
 MODELS_MAP = {
     "Groq API": (groq_formatted, groq_key, "groq"),
@@ -320,120 +314,81 @@ MODELS_MAP = {
     "Gemini API": (gemini_formatted, gemini_key, "gemini")
 }
 
-selected_model_option = None
 consensus_mode = True
 models_config_list = []
 
-if api_provider_selection != "Kural Tabanlı (Çevrimdışı Fallback)":
-    consensus_mode = st.sidebar.checkbox(
-        "Çoklu LLM Mutabakat Analizi (Consensus Mode) 🎓",
-        value=True,
-        help="Aynı veya farklı sağlayıcılara ait 3 farklı model paralel olarak çalıştırılır. Sınıflandırmalar çoğunluk oylaması ile belirlenir ve Fleiss' Kappa akademik güvenilirlik skorları hesaplanır."
-    )
-    
-    if consensus_mode:
-        with st.sidebar.expander("🛠️ Mutabakat Modellerini Seç", expanded=True):
-            # Model 1
-            st.markdown("**1. Model Yapılandırması**")
-            m1_prov = st.selectbox("Sağlayıcı 1:", ["Gemini API", "Groq API", "OpenRouter"], key="m1_prov")
-            m1_models_list, m1_key, m1_code = MODELS_MAP[m1_prov]
-            m1_choice = st.selectbox("Model 1:", m1_models_list + ["Özel Model Gir (Custom)..."], key="m1_choice")
-            m1_val = ""
-            if m1_choice == "Özel Model Gir (Custom)...":
-                m1_val = st.text_input("Özel Model 1 Kodu:", key="m1_custom").strip()
-            else:
-                m1_val = parse_selected_model(m1_choice)
-            models_config_list.append({"provider": m1_code, "api_key": m1_key, "model": m1_val})
-            
-            # Model 2
-            st.markdown("**2. Model Yapılandırması**")
-            m2_prov = st.selectbox("Sağlayıcı 2:", ["Gemini API", "Groq API", "OpenRouter"], key="m2_prov")
-            m2_models_list, m2_key, m2_code = MODELS_MAP[m2_prov]
-            m2_choice = st.selectbox("Model 2:", m2_models_list + ["Özel Model Gir (Custom)..."], key="m2_choice")
-            m2_val = ""
-            if m2_choice == "Özel Model Gir (Custom)...":
-                m2_val = st.text_input("Özel Model 2 Kodu:", key="m2_custom").strip()
-            else:
-                m2_val = parse_selected_model(m2_choice)
-            models_config_list.append({"provider": m2_code, "api_key": m2_key, "model": m2_val})
-            
-            # Model 3
-            st.markdown("**3. Model Yapılandırması**")
-            m3_prov = st.selectbox("Sağlayıcı 3:", ["Gemini API", "Groq API", "OpenRouter"], key="m3_prov")
-            m3_models_list, m3_key, m3_code = MODELS_MAP[m3_prov]
-            m3_choice = st.selectbox("Model 3:", m3_models_list + ["Özel Model Gir (Custom)..."], key="m3_choice")
-            m3_val = ""
-            if m3_choice == "Özel Model Gir (Custom)...":
-                m3_val = st.text_input("Özel Model 3 Kodu:", key="m3_custom").strip()
-            else:
-                m3_val = parse_selected_model(m3_choice)
-            models_config_list.append({"provider": m3_code, "api_key": m3_key, "model": m3_val})
-    else:
-        provider_models, selected_key, provider_code = MODELS_MAP[api_provider_selection]
-        model_list = provider_models + ["Özel Model Gir (Custom)..."]
-        model_choice = st.sidebar.selectbox("Kullanılacak Model Seçimi:", model_list)
-        if model_choice == "Özel Model Gir (Custom)...":
-            selected_model_option = st.sidebar.text_input("Özel Model Kodunu Girin (Örn: google/gemma-7b):").strip()
-        else:
-            selected_model_option = parse_selected_model(model_choice)
+st.sidebar.markdown("### 🛠️ Mutabakat Modellerini Seç")
+
+# Model 1
+st.sidebar.markdown("**1. Model Yapılandırması**")
+m1_prov = st.sidebar.selectbox("Sağlayıcı 1:", ["Gemini API", "Groq API", "OpenRouter"], key="m1_prov")
+m1_models_list, m1_key, m1_code = MODELS_MAP[m1_prov]
+m1_choice = st.sidebar.selectbox("Model 1:", m1_models_list + ["Özel Model Gir (Custom)..."], key="m1_choice")
+m1_val = ""
+if m1_choice == "Özel Model Gir (Custom)...":
+    m1_val = st.sidebar.text_input("Özel Model 1 Kodu:", key="m1_custom").strip()
+else:
+    m1_val = parse_selected_model(m1_choice)
+models_config_list.append({"provider": m1_code, "api_key": m1_key, "model": m1_val})
+
+# Model 2
+st.sidebar.markdown("**2. Model Yapılandırması**")
+m2_prov = st.sidebar.selectbox("Sağlayıcı 2:", ["Gemini API", "Groq API", "OpenRouter"], key="m2_prov")
+m2_models_list, m2_key, m2_code = MODELS_MAP[m2_prov]
+m2_choice = st.sidebar.selectbox("Model 2:", m2_models_list + ["Özel Model Gir (Custom)..."], key="m2_choice")
+m2_val = ""
+if m2_choice == "Özel Model Gir (Custom)...":
+    m2_val = st.sidebar.text_input("Özel Model 2 Kodu:", key="m2_custom").strip()
+else:
+    m2_val = parse_selected_model(m2_choice)
+models_config_list.append({"provider": m2_code, "api_key": m2_key, "model": m2_val})
+
+# Model 3
+st.sidebar.markdown("**3. Model Yapılandırması**")
+m3_prov = st.sidebar.selectbox("Sağlayıcı 3:", ["Gemini API", "Groq API", "OpenRouter"], key="m3_prov")
+m3_models_list, m3_key, m3_code = MODELS_MAP[m3_prov]
+m3_choice = st.sidebar.selectbox("Model 3:", m3_models_list + ["Özel Model Gir (Custom)..."], key="m3_choice")
+m3_val = ""
+if m3_choice == "Özel Model Gir (Custom)...":
+    m3_val = st.sidebar.text_input("Özel Model 3 Kodu:", key="m3_custom").strip()
+else:
+    m3_val = parse_selected_model(m3_choice)
+models_config_list.append({"provider": m3_code, "api_key": m3_key, "model": m3_val})
 
 # Durumu State'e kaydet
 if "active_api" not in st.session_state:
     st.session_state.active_api = None
 
 # Bağlantı Testi
-if api_provider_selection != "Kural Tabanlı (Çevrimdışı Fallback)":
-    if st.sidebar.button("🔌 Servis Bağlantılarını Test Et"):
-        from api_client import test_api_connection
-        if consensus_mode:
-            all_ok = True
-            with st.spinner("Seçilen 3 modelin bağlantıları test ediliyor..."):
-                for idx, cfg in enumerate(models_config_list):
-                    p_code = cfg["provider"]
-                    key = cfg["api_key"]
-                    model_val = cfg["model"]
-                    
-                    if not key or key.startswith("your_") or len(key.strip()) <= 10:
-                        st.sidebar.error(f"❌ Model {idx+1} sağlayıcısı için geçerli bir API anahtarı bulunamadı.")
-                        all_ok = False
-                        break
-                        
-                    success, model_resolved, msg = test_api_connection(p_code, key, selected_model=model_val)
-                    if success:
-                        st.sidebar.success(f"🟢 Model {idx+1} ({model_resolved}) bağlantısı başarılı!")
-                    else:
-                        st.sidebar.error(f"🔴 Model {idx+1} bağlantı hatası: {msg}")
-                        all_ok = False
-                        
-                if all_ok:
-                    st.session_state.active_api = {
-                        "models_config": models_config_list,
-                        "consensus_mode": True
-                    }
-                    st.sidebar.success("🏆 Tüm model bağlantı testleri başarıyla tamamlandı!")
-                else:
-                    st.session_state.active_api = None
-        else:
-            # Tekil model testi
-            provider_models, selected_key, provider_code = MODELS_MAP[api_provider_selection]
-            if selected_key and not selected_key.startswith("your_") and len(selected_key.strip()) > 10:
-                with st.spinner("Bağlantı test ediliyor..."):
-                    success, model_resolved, msg = test_api_connection(provider_code, selected_key, selected_model=selected_model_option)
-                    if success:
-                        st.session_state.active_api = {
-                            "provider": provider_code,
-                            "api_key": selected_key,
-                            "model": model_resolved,
-                            "consensus_mode": False
-                        }
-                        st.sidebar.success(msg)
-                    else:
-                        st.session_state.active_api = None
-                        st.sidebar.error(msg)
+if st.sidebar.button("🔌 Servis Bağlantılarını Test Et"):
+    from api_client import test_api_connection
+    all_ok = True
+    with st.spinner("Seçilen 3 modelin bağlantıları test ediliyor..."):
+        for idx, cfg in enumerate(models_config_list):
+            p_code = cfg["provider"]
+            key = cfg["api_key"]
+            model_val = cfg["model"]
+            
+            if not key or key.startswith("your_") or len(key.strip()) <= 10:
+                st.sidebar.error(f"❌ Model {idx+1} sağlayıcısı için geçerli bir API anahtarı bulunamadı.")
+                all_ok = False
+                break
+                
+            success, model_resolved, msg = test_api_connection(p_code, key, selected_model=model_val)
+            if success:
+                st.sidebar.success(f"🟢 Model {idx+1} ({model_resolved}) bağlantısı başarılı!")
             else:
-                st.sidebar.warning("Seçilen servis için .env dosyasında geçerli bir anahtar bulunamadı.")
-else:
-    st.session_state.active_api = None
+                st.sidebar.error(f"🔴 Model {idx+1} bağlantı hatası: {msg}")
+                all_ok = False
+                
+        if all_ok:
+            st.session_state.active_api = {
+                "models_config": models_config_list,
+                "consensus_mode": True
+            }
+            st.sidebar.success("🏆 Tüm model bağlantı testleri başarıyla tamamlandı!")
+        else:
+            st.session_state.active_api = None
 
 
 # Ana Sayfa Başlık Alanı
@@ -540,45 +495,23 @@ with tab_analiz:
         selected_api_info = None
         btn_disabled = True
         
-        if api_provider_selection == "Kural Tabanlı (Çevrimdışı Fallback)":
-            st.info("ℹ️ **Aktif Mod:** Çevrimdışı Kural Tabanlı Analiz (Fallback)")
-            selected_api_info = None
-            btn_disabled = False
+        keys_missing = False
+        for cfg in models_config_list:
+            if not cfg["api_key"] or cfg["api_key"].startswith("your_") or len(cfg["api_key"].strip()) <= 10:
+                keys_missing = True
+                break
+        
+        if keys_missing:
+            st.error("❌ Mutabakat modellerinden biri için geçerli bir API anahtarı bulunamadı. Lütfen anahtar durumlarını sol menüden kontrol edin.")
         else:
-            if consensus_mode:
-                keys_missing = False
-                for cfg in models_config_list:
-                    if not cfg["api_key"] or cfg["api_key"].startswith("your_") or len(cfg["api_key"].strip()) <= 10:
-                        keys_missing = True
-                        break
-                
-                if keys_missing:
-                    st.error("❌ Mutabakat modellerinden biri için geçerli bir API anahtarı bulunamadı. Lütfen anahtar durumlarını sol menüden kontrol edin.")
-                else:
-                    st.success("🎓 **Çoklu LLM Mutabakat Modu Aktif**")
-                    models_summary = "\n".join([f"- Model {idx+1} ({cfg['provider'].upper()}): `{cfg['model']}`" for idx, cfg in enumerate(models_config_list)])
-                    st.info(f"Seçilen Modeller:\n{models_summary}")
-                    selected_api_info = {
-                        "models_config": models_config_list,
-                        "consensus_mode": True
-                    }
-                    btn_disabled = False
-            else:
-                provider_models, selected_key, provider_code = MODELS_MAP[api_provider_selection]
-                if not selected_key or selected_key.startswith("your_") or len(selected_key.strip()) <= 10:
-                    st.error(f"❌ {api_provider_selection} seçildi ancak sistemde geçerli bir API anahtarı yapılandırılmamış.")
-                elif not selected_model_option:
-                    st.warning("⚠️ Lütfen sol menüden geçerli bir model seçin.")
-                else:
-                    st.success(f"🤖 **Tekil LLM Analiz Modu Aktif ({api_provider_selection})**")
-                    st.info(f"Model: `{selected_model_option}`")
-                    selected_api_info = {
-                        "provider": provider_code,
-                        "api_key": selected_key,
-                        "model": selected_model_option,
-                        "consensus_mode": False
-                    }
-                    btn_disabled = False
+            st.success("🎓 **Çoklu LLM Mutabakat Modu Aktif**")
+            models_summary = "\n".join([f"- Model {idx+1} ({cfg['provider'].upper()}): `{cfg['model']}`" for idx, cfg in enumerate(models_config_list)])
+            st.info(f"Seçilen Modeller:\n{models_summary}")
+            selected_api_info = {
+                "models_config": models_config_list,
+                "consensus_mode": True
+            }
+            btn_disabled = False
                     
         st.markdown("---")
         st.markdown("**📥 Yorum İndirme ve Örneklem Seçenekleri**")
