@@ -126,61 +126,7 @@ def download_live_comments(video_id_or_url, max_comments=50):
         print(f"Error downloading comments for {video_id_or_url}: {e}")
         return []
 
-def ana_veriyi_kaydet(sihay_yorumlar, meydan_yorumlar):
-    """
-    Indirilen ve maskelenen verileri JSON olarak kaydeder.
-    """
-    data_dir = os.path.join(os.path.dirname(__file__), "data")
-    os.makedirs(data_dir, exist_ok=True)
-    
-    sihay_path = os.path.join(data_dir, "ozan_sihay_yorumlar.json")
-    meydan_path = os.path.join(data_dir, "erhan_meydan_yorumlar.json")
-    
-    with open(sihay_path, "w", encoding="utf-8") as f:
-        json.dump(sihay_yorumlar, f, indent=2, ensure_ascii=False)
-        
-    with open(meydan_path, "w", encoding="utf-8") as f:
-        json.dump(meydan_yorumlar, f, indent=2, ensure_ascii=False)
-        
-    print("Data processed and saved successfully.")
-
 if __name__ == "__main__":
     print("YouTube Comment Anonymizer Starting...")
     print("ETHICAL WARNING: Usernames will be hashed via SHA-256 and identifiers masked.")
-    
-    # Ozan Sihay & Erhan Meydan secilen video ID listeleri (Varsayilan testler icin)
-    videos_sihay = ["HK6y8DAPN_0", "kYJ-w8R0o8I"]
-    videos_meydan = ["fJ92B2K-Dqg", "g1_vFX-D8wY"]  # ornek idler
-    
-    # Varsayilan olarak localdeki veriyi maskeler
-    data_dir = os.path.join(os.path.dirname(__file__), "data")
-    sihay_path = os.path.join(data_dir, "ozan_sihay_yorumlar.json")
-    meydan_path = os.path.join(data_dir, "erhan_meydan_yorumlar.json")
-    
-    if os.path.exists(sihay_path) and os.path.exists(meydan_path):
-        with open(sihay_path, "r", encoding="utf-8") as f:
-            sihay_raw = json.load(f)
-        with open(meydan_path, "r", encoding="utf-8") as f:
-            meydan_raw = json.load(f)
-            
-        sihay_anonymized = []
-        for item in sihay_raw:
-            sihay_anonymized.append({
-                "id": item["id"],
-                "username": anonimlestir_kullanici(item["username"]),
-                "video_title": item["video_title"],
-                "comment": yorum_temizle(item["comment"]),
-                "likes": item["likes"]
-            })
-            
-        meydan_anonymized = []
-        for item in meydan_raw:
-            meydan_anonymized.append({
-                "id": item["id"],
-                "username": anonimlestir_kullanici(item["username"]),
-                "video_title": item["video_title"],
-                "comment": yorum_temizle(item["comment"]),
-                "likes": item["likes"]
-            })
-            
-        ana_veriyi_kaydet(sihay_anonymized, meydan_anonymized)
+    print("Bu dosya genellikle arayüzden çağrılmaktadır (app.py) veya canlı test için import edilmektedir.")

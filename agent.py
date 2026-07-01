@@ -38,11 +38,7 @@ class IklimAynasiAgent:
         # Topluluk Türünün Otomatik Tespiti
         self.log_action("Topluluk Türü Tespiti", "Yorum kelimelerine göre topluluk türü analiz ediliyor...")
         topluluk_turu = topluluk_turu_tespit_et(yorumlar)
-        turu_str = {
-            "sihay": "Yaratıcı & Tasarım Odaklı Topluluk",
-            "meydan": "Teknik & Otomasyon Odaklı Topluluk",
-            "genel": "Genel / Karma Eğitim Topluluğu"
-        }.get(topluluk_turu, "Bilinmeyen Topluluk")
+        turu_str = "Genel / Karma Eğitim Topluluğu"
         
         self.log_action("Topluluk Türü Saptandı", f"Otomatik saptanan tür: {turu_str}")
         

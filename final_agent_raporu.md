@@ -44,7 +44,7 @@ Bu çalışmada geliştirilen ajan, yönergedeki "Bileşen Zorunlu Beklentileri"
 ---
 
 ## 3. Yöntem
-Bu araştırma, çevrimiçi informal eğitim topluluklarının davranış örüntülerini anlamaya yönelik **tekil durum çalışması (case study)** deseninde tasarlanmıştır. Araştırmanın veri setini, Türkiye'de yapay zekâ ve yazılım eğitimi alanında popüler olan iki farklı kanaldan (Ozan Sihay - Yaratıcı kitle, Erhan Meydan - Teknik kitle) çekilen kamuya açık YouTube yorumları oluşturmaktadır.
+Bu araştırma, çevrimiçi informal eğitim topluluklarının davranış örüntülerini anlamaya yönelik **tekil durum çalışması (case study)** deseninde tasarlanmıştır. Araştırmanın veri setini, Türkiye'de yapay zekâ ve yazılım eğitimi alanında popüler olan çeşitli eğitim kanallarından çekilen kamuya açık YouTube yorumları oluşturmaktadır.
 
 ### Etik İlkeler ve Veri Arıtma Adımları:
 1. **SHA-256 Anonimleştirme:** Çevrimiçi etnografik araştırmalarda kişisel verilerin korunması esastır. Geliştirilen veri çekim modülü (`get_youtube_comments.py`), yorum yazan kullanıcıların gerçek kullanıcı adlarını SHA-256 kriptografik hashing algoritması ile maskeleyerek benzersiz sanal kimlikler üretir (Örn: `user_3a7b9c...`).
@@ -91,9 +91,9 @@ Ajanın analitik performansı, hem kural tabanlı sözlüklerle hem de LLM-first
 ---
 
 ## 6. Tartışma
-Ajanın analiz sonuçları incelendiğinde, iki farklı kanal izleyici kitlesinin siber-kültürel dinamiklerinde belirgin farklar gözlenmiştir. **Ozan Sihay** (Yaratıcı kitle) videolarının altında "Görsel Sanatlar ve Yaratıcılığın Yapay Zekâ Tarafından Tehdit Edilmesi" temalı gelecek kaygısı ve telif hakları hassasiyeti ön plana çıkmaktadır. Buna karşılık, **Erhan Meydan** (Teknik kitle) videolarının altında otomasyon heyecanı ve sistem entegrasyonu (Docker, n8n) odaklı "maliyet" ve "teknik hata ayıklama" konuları baskındır.
+Ajanın analiz sonuçları incelendiğinde, farklı eğitim videoları izleyici kitlesinin siber-kültürel dinamiklerinde belirgin farklar gözlenmiştir. Yaratıcı içerikli videoların altında "Görsel Sanatlar ve Yaratıcılığın Yapay Zekâ Tarafından Tehdit Edilmesi" temalı gelecek kaygısı ve telif hakları hassasiyeti ön plana çıkmaktadır. Buna karşılık, teknik içerikli videoların altında otomasyon heyecanı ve sistem entegrasyonu odaklı "maliyet" ve "teknik hata ayıklama" konuları baskındır.
 
-Eğitimciler için bu bulgular, iki farklı kitleye yönelik farklı pedagojik stratejiler geliştirilmesi gerektiğini gösterir. Yaratıcı kitleye yapay zekâ bir "rakip" değil "üretken bir ortak" olarak anlatılmalıyken; teknik kitleye sadece hazır otomasyon kodları ezberletilmemeli, arkasındaki sistem mimarisi ve güvenlik konuları sorgulatılmalıdır.
+Eğitimciler için bu bulgular, farklı ilgi alanlarına yönelik farklı pedagojik stratejiler geliştirilmesi gerektiğini gösterir. Yaratıcı kitleye yapay zekâ bir "rakip" değil "üretken bir ortak" olarak anlatılmalıyken; teknik kitleye sadece hazır otomasyon kodları ezberletilmemeli, arkasındaki sistem mimarisi ve güvenlik konuları sorgulatılmalıdır.
 
 ---
 

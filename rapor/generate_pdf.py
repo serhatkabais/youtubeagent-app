@@ -126,7 +126,7 @@ def build_pdf(filename="proje_raporu.pdf"):
     story.append(Paragraph("EĞİTİMDE YAPAY ZEKÂ KULLANIMI", title_style))
     story.append(Paragraph("FİNAL AGENT PROJE RAPORU", title_style))
     story.append(Spacer(1, 10))
-    story.append(Paragraph("<b>Konu:</b> Çift Kanallı Karşılaştırmalı Yorum Analiz Ajanı<br/>(Ozan Sihay & Erhan Meydan Kanalları Etnografik İncelemesi)", subtitle_style))
+    story.append(Paragraph("<b>Konu:</b> Eğitim Videoları İzleyici Yorum Analiz Ajanı<br/>(Çevrimiçi Topluluk Etnografik İncelemesi)", subtitle_style))
     story.append(Spacer(1, 150))
     
     # Kapak Alt Bilgisi
@@ -149,9 +149,7 @@ def build_pdf(filename="proje_raporu.pdf"):
     story.append(Paragraph(
         "Bu proje, asenkron ve gayriresmi (informal) izleyici topluluklarında yapay zekâ okuryazarlığını, "
         "gelecek kaygılarını, akran yardımlaşması kültürünü ve dijital rolleri karşılaştırmalı olarak analiz eden bir "
-        "karar destek ajanı modelidir. Analiz için Türkiye'nin teknoloji eğitimi alanındaki iki lider kanalı seçilmiştir:<br/>"
-        "1. <b>Ozan Sihay (Yaratıcı Kitle):</b> Görsel sanatlar, kurgu ve yapay zekâ üretkenliği odağındaki tasarımcıların mesleki gelecek kaygıları.<br/>"
-        "2. <b>Erhan Meydan (Teknik Kitle):</b> Yapay zekâ ajanları, n8n otomasyonları ve docker sunucu entegrasyonu odağındaki sistemcilerin teknik jargonu.",
+        "karar destek ajanı modelidir.",
         body_style
     ))
     
@@ -164,15 +162,13 @@ def build_pdf(filename="proje_raporu.pdf"):
     ))
     
     # Tablo: Karşılaştırmalı Video Veri Seti
-    story.append(Paragraph("Tablo 1: Analiz Edilen Kilit Video Veri Setleri", h1_style))
+    story.append(Paragraph("Tablo 1: Analiz Edilen Örnek Video Veri Setleri", h1_style))
     table_data = [
-        [Paragraph("<b>Kanal</b>", body_style), Paragraph("<b>Video Başlığı</b>", body_style), Paragraph("<b>İzlenme</b>", body_style), Paragraph("<b>Odak Kitle</b>", body_style)],
-        [Paragraph("Ozan Sihay", body_style), Paragraph("Bu Yapay Zeka ŞAKA mı? #Sora", body_style), Paragraph("~112K", body_style), Paragraph("Yaratıcı Kaygı", body_style)],
-        [Paragraph("Ozan Sihay", body_style), Paragraph("Tüm Yapay Zekaları Bir Arada Kullandım", body_style), Paragraph("~94K", body_style), Paragraph("Pratik Kullanım", body_style)],
-        [Paragraph("Erhan Meydan", body_style), Paragraph("n8n ile AI Ajanı - Claude MCP", body_style), Paragraph("~120K", body_style), Paragraph("Otomasyon/Kod", body_style)],
-        [Paragraph("Erhan Meydan", body_style), Paragraph("n8n + Drive + Gemini Otomasyonu", body_style), Paragraph("~48K", body_style), Paragraph("Teknik Entegrasyon", body_style)]
+        [Paragraph("<b>Kategori</b>", body_style), Paragraph("<b>Video Başlığı</b>", body_style), Paragraph("<b>Odak Kitle</b>", body_style)],
+        [Paragraph("Yaratıcı", body_style), Paragraph("Yapay Zeka ile İçerik Üretimi", body_style), Paragraph("Yaratıcı Kaygı", body_style)],
+        [Paragraph("Teknik", body_style), Paragraph("Yapay Zeka Ajanları ve Otomasyon", body_style), Paragraph("Otomasyon/Kod", body_style)]
     ]
-    t = Table(table_data, colWidths=[80, 200, 70, 130])
+    t = Table(table_data, colWidths=[100, 250, 130])
     t.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#E2E8F0")),
         ('GRID', (0,0), (-1,-1), 1, colors.HexColor("#CBD5E0")),

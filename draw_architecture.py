@@ -153,7 +153,7 @@ def draw_arch():
     box3_title = "3. Otomatik Topluluk İklim Dedektörü"
     box3_pts = [
         "Heuristic kelime frekansı taramasıyla topluluk türü tespiti.",
-        "Kitlenin Yaratıcı (Sihay), Teknik (Meydan) veya Genel olarak ayrılması."
+        "Kitlenin eğitim alanındaki ilgi ve analiz profiline göre sınıflandırılması."
     ]
     box3_w = 500
     box3_h = get_box_height(box3_title, box3_pts, font_box_title, font_box_text, box3_w)

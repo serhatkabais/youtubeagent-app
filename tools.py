@@ -5,30 +5,6 @@ import re
 
 # Etnografik Kural Tabanli Kelime Sozlukleri (Yuksek Cozunurluklu Analiz icin)
 # YENI 12-KATEGORILI TAKSONOMI
-JARGONS_SIHAY = {
-    "Mesleki Gelecek Kaygisi": ["meslek", "bitti", "issiz", "ekmek", "korku", "yok edecek", "gelecek", "kaygi", "tehdit", "endise", "sektor", "yerimizi alacak", "ne yapacagiz"],
-    "Heyecan ve Kesif Motivasyonu": ["harika", "inanilmaz", "deneyecegim", "super", "muhtesem", "demokratiklesme", "heyecan", "efsane", "mukemmel", "muthis", "buyuleyici", "kalite", "sanat", "saka"],
-    "Etik ve Telif Hassasiyeti": ["etik disi", "izinsiz", "taranmasi", "karsiyim", "emek hirsizligi", "sanatci haklari", "intihal", "emek", "hirsizlik", "ozgun", "kopya"],
-    "Teknik Sorun ve Destek Arayisi": ["parametre", "hata", "nasil", "kodlar", "yardimci", "hata aliyorum", "calismadi", "versiyon"],
-    "Maliyet ve Erisilebilirlik Sorunu": ["ucretsiz", "bedava", "uyelik", "kredi", "dolar", "fatura", "maliyet", "parali"],
-    "Yaratici Is Akisi Tartismasi": ["kurgu", "montaj", "video", "premiere", "capcut", "runway", "midjourney", "ses", "arkaplan", "render", "kamera", "animasyon", "workflow"],
-    "Sosyal Destek ve Tesekkur": ["tesekkur", "emegine saglik", "cansin", "hocam", "abi", "kral", "dokturmussun", "iyi ki varsin", "eline saglik", "sagol", "selam"],
-    "Akran Mentorlugu ve Yonlendirme": ["bunu dene", "emin ol", "kullanirsan", "cozum", "linkte var"],
-    "Icerik Talebi ve Oneri": ["devami gelsin", "sunu da", "yaparsaniz sevinirim", "bekliyoruz"],
-    "Ironi, Kinaye veya Sarkastik Yorum": ["yok artik", "tabii canim", "kesin oyledir", "isimize yarar (!)", "ne guzel", "issiz kaldik desene"]
-}
-
-JARGONS_MEYDAN = {
-    "Teknik Sorun ve Destek Arayisi": ["webhook", "hata", "port", "baglanti", "docker", "connection", "localhost", "notebook", "kutuphane", "hata aliyorum", "kod", "python", "hata veriyor", "tetiklenmiyor"],
-    "Heyecan ve Kesif Motivasyonu": ["otomatik", "saniyeler", "zaman kazandiriyor", "sayenizde", "is yukunu", "mucize", "kolaylastirdi", "verimlilik", "asistan", "hizli", "agent", "ajan"],
-    "Etik ve Telif Hassasiyeti": ["sinav", "kopya", "odev", "ogrenme", "adil", "akademik durustluk"],
-    "Felsefi/Varolussal Sorgulama": ["bilissel", "tembellik", "zihinsel", "denge", "etik", "guvenlik", "yapay zeka nereye", "tehlike", "bilinc"],
-    "Yaratici Is Akisi Tartismasi": ["mimari", "tasarim", "framework", "sunucu", "vps", "mcp", "n8n", "claude", "gemini", "agentic", "otonom", "entegrasyon"],
-    "Maliyet ve Erisilebilirlik Sorunu": ["api", "token", "maliyet", "fatura", "dolar", "can sikiyor", "ucretli", "ollama", "yerel model", "local", "llama", "harcama"],
-    "Sosyal Destek ve Tesekkur": ["tesekkur", "emegine saglik", "cansin", "hocam", "abi", "kral", "rehber", "eline saglik", "sagol", "selam", "iyi ki varsin"],
-    "Akran Mentorlugu ve Yonlendirme": ["kurmayi dene", "oneririm", "yazman gerekiyor", "github"]
-}
-
 JARGONS_GENEL = {
     "Mesleki Gelecek Kaygisi": ["meslek", "bitti", "issiz", "korku", "yok edecek", "gelecek", "kaygi", "tehdit", "endise"],
     "Teknik Sorun ve Destek Arayisi": ["hata", "baglanti", "docker", "hata aliyorum", "calismadi", "versiyon", "sunucu"],
@@ -41,28 +17,9 @@ JARGONS_GENEL = {
 def topluluk_turu_tespit_et(yorumlar):
     """
     Yorum havuzundaki kelime sikliklarina gore toplulugun turunu otomatik tespit eder.
+    Sadelestirilmis versiyon: Sadece genel topluluk döner.
     """
-    creative_words = ["kurgu", "tasarim", "premiere", "video", "render", "midjourney", "sora", "gorsel", "capcut", "runway", "vfx", "sanat", "photoshop", "kamera", "montaj"]
-    technical_words = ["docker", "webhook", "port", "n8n", "kod", "python", "api", "server", "localhost", "connection", "entegrasyon", "veritabani", "database", "mcp", "sunucu", "container"]
-    
-    creative_score = 0
-    technical_score = 0
-    
-    for y in yorumlar:
-        comment_lower = y.get("comment", "").lower()
-        for w in creative_words:
-            if w in comment_lower:
-                creative_score += 1
-        for w in technical_words:
-            if w in comment_lower:
-                technical_score += 1
-                
-    if creative_score > technical_score and creative_score >= 2:
-        return "sihay"  # Yaratici / Tasarim
-    elif technical_score > creative_score and technical_score >= 2:
-        return "meydan"  # Teknik / Otomasyon
-    else:
-        return "genel"  # Genel / Karma
+    return "genel"
 
 def kelime_sayaci_analiz(yorum, sozluk):
     """
@@ -89,12 +46,7 @@ def duygu_ve_kaygi_analizi(yorumlar, topluluk_turu):
     """
     [ARAC 1] Yorumlardaki duygu, kaygi ve temalari analiz eder.
     """
-    if topluluk_turu == "sihay":
-        sozluk = JARGONS_SIHAY
-    elif topluluk_turu == "meydan":
-        sozluk = JARGONS_MEYDAN
-    else:
-        sozluk = JARGONS_GENEL
+    sozluk = JARGONS_GENEL
         
     sonuclar = {}
     for y in yorumlar:
@@ -118,36 +70,13 @@ def dijital_rol_dedektoru(yorumlar, topluluk_turu):
         if cevap_mi:
             rol = "Akran Mentoru"
         else:
-            if topluluk_turu == "sihay":
-                if any(w in yorum_text for w in ["kurgu", "tasarim", "premiere", "is akis", "calisiyorum", "render"]):
-                    rol = "Profesyonel Uygulayici"
-                elif any(w in yorum_text for w in ["etik", "sanatci", "telif", "emek"]):
-                    rol = "Elestirel Dusunur"
-                elif any(w in yorum_text for w in ["nasil", "yapabilirim", "ogrenmek"]):
-                    rol = "Yeni Kesfeci / Merakli"
-                elif any(w in yorum_text for w in ["calismadi", "hata", "parali"]):
-                    rol = "Hayal Kirikligi"
-                else:
-                    rol = "Pasif Destekci"
-            elif topluluk_turu == "meydan":
-                if any(w in yorum_text for w in ["sirket", "docker", "port", "sistem", "entegrasyon", "otomasyon"]):
-                    rol = "Profesyonel Uygulayici"
-                elif any(w in yorum_text for w in ["etik", "bilissel", "tehlike", "felsefi"]):
-                    rol = "Elestirel Dusunur"
-                elif any(w in yorum_text for w in ["nasil", "baslarim", "rehber"]):
-                    rol = "Yeni Kesfeci / Merakli"
-                elif any(w in yorum_text for w in ["hata", "calismiyor", "token", "ucretli"]):
-                    rol = "Hayal Kirikligi"
-                else:
-                    rol = "Pasif Destekci"
-            else:  # genel
-                if any(w in yorum_text for w in ["nasil", "harika"]):
-                    rol = "Yeni Kesfeci / Merakli"
-                elif any(w in yorum_text for w in ["calismiyor", "hata"]):
-                    rol = "Hayal Kirikligi"
-                else:
-                    rol = "Pasif Destekci"
-                    
+            if any(w in yorum_text for w in ["nasil", "harika"]):
+                rol = "Yeni Kesfeci / Merakli"
+            elif any(w in yorum_text for w in ["calismiyor", "hata"]):
+                rol = "Hayal Kirikligi"
+            else:
+                rol = "Pasif Destekci"
+                
         sonuclar[rol] = sonuclar.get(rol, 0) + 1
         
     return sonuclar
@@ -188,11 +117,7 @@ def izleyici_raporu_olusturucu(duygu_analizler, rol_analizler, topluluk_turu):
     """
     rapor = "## Topluluk Izleyici Iklimi & Kulturel Analiz Raporu\n\n"
     
-    turu_str = {
-        "sihay": "Yaratici & Tasarim Odakli Topluluk",
-        "meydan": "Teknik & Otomasyon Odakli Topluluk",
-        "genel": "Genel / Karma Egitim Toplulugu"
-    }.get(topluluk_turu, "Bilinmeyen Topluluk")
+    turu_str = "Genel / Karma Egitim Toplulugu"
     
     rapor += f"### Saptanan Iklim Turu: **{turu_str}**\n"
     
@@ -248,15 +173,8 @@ def izleyici_raporu_olusturucu(duygu_analizler, rol_analizler, topluluk_turu):
  
     
     rapor += "### Etnografik Degerlendirme\n"
-    if topluluk_turu == "sihay":
-        rapor += "Bu toplulukta estetik uretim kaygilari on plandadir. Izleyiciler yapay zekayi mesleklerini ellerinden alacak ekonomik bir tehdit olarak gorme egilimindedir. Teknik sorunlar daha cok pratik arayuz ve parametre ayarlarina odaklanmaktadir.\n\n"
-        rapor += "**Egitsel Mudahale Onerisi:** Yaratici sureclerde yapay zeka entegrasyonu anlatilirken, yapay zekanin insanin ozgunlugunu oldurmeyecegi, aksine hizlandirici bir asistan oldugu vurgulanmalidir. Egitim mufredatlarina 'Yapay Zeka ile Birlikte Yaratim (Human-AI Co-Creation)' atolyeleri eklenmelidir.\n"
-    elif topluluk_turu == "meydan":
-        rapor += "Bu toplulukta is sureclerinin otomatizasyonu ve verimlilik motivasyonu cok yuksektir. Ancak izleyicilerin karsilastigi en buyuk engeller teknik entegrasyon hatalari (port cakismasi, docker hatalari vb.) ve API maliyetleridir. Bilissel yuku yapay zekaya devretme hevesi mevcuttur.\n\n"
-        rapor += "**Egitsel Mudahale Onerisi:** Izleyicilere sadece otomasyon akislari (no-code) kurmak degil, sistem mimarisi, veri guvenligi ve debugging (hata ayiklama) surecleri de derinlemesine ogretilmelidir. Yapay zekanin getirecegi 'bilissel tembellik' riskine karsi, izleyicileri kodun arkasindaki mantigi sorgulamaya iten odevler kurgulanmalidir.\n"
-    else:
-        rapor += "Bu topluluk karma ve genel bir izleyici iklimi sergilemektedir. Hem pratik arac kullanimi meraki hem de genel yapay zeka okuryazarligi ihtiyaci mevcuttur. Belirgin tek bir jargon kumesi yerine sosyal tesekkur ve basit arayislar yogundur.\n\n"
-        rapor += "**Egitsel Mudahale Onerisi:** Karma izleyici gruplarinda temel yapay zeka okuryazarligi dersleri onceliklendirilmelidir. Teknik ve yaratici becerileri harmanlayan disiplinlerarasi projeler gelistirilmeli, akran mentorlugunu artirmak icin isbirlikci calisma gruplari kurulmalidir.\n"
+    rapor += "Bu topluluk karma ve genel bir izleyici iklimi sergilemektedir. Hem pratik arac kullanimi meraki hem de genel yapay zeka okuryazarligi ihtiyaci mevcuttur. Belirgin tek bir jargon kumesi yerine sosyal tesekkur ve basit arayislar yogundur.\n\n"
+    rapor += "**Egitsel Mudahale Onerisi:** Karma izleyici gruplarinda temel yapay zeka okuryazarligi dersleri onceliklendirilmelidir. Teknik ve yaratici becerileri harmanlayan disiplinlerarasi projeler gelistirilmeli, akran mentorlugunu artirmak icin isbirlikci calisma gruplari kurulmalidir.\n"
         
     rapor += "\n> [!IMPORTANT]\n"
     rapor += "> **Degerlendirme ve Etik Sinir Uyarisi:** Bu rapor, cevrimici toplulugun dil jargonlari ve davranissal ayak izlerinin otomatik analizi ile uretilmistir. Bu veriler kesin birer hukum teskil etmez. Mudahaler uygulanmadan once mutlaka arastirmaci degerlendirmesi ve insan odakli gozlemlerle dogrulanmalidir."
