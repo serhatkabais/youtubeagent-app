@@ -88,7 +88,7 @@ class IklimAynasiAgent:
         model_info = "Kural Tabanlı Analiz (Çevrimdışı Fallback)"
         llm_analysis_results = None
         
-        if api_info and api_info.get("api_key") and (api_info.get("model") or api_info.get("models")):
+        if api_info and (api_info.get("api_key") or (api_info.get("consensus_mode") and api_info.get("models_config"))):
             from api_client import get_llm_report, analyze_comments_with_llm, analyze_comments_with_llm_consensus
             
             try:
