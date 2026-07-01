@@ -310,7 +310,7 @@ else:
 # Sağlayıcı Seçimi
 api_provider_selection = st.sidebar.selectbox(
     "Aktif Analiz Sağlayıcısı:",
-    ["Kural Tabanlı (Çevrimdışı Fallback)", "Groq API", "OpenRouter", "Gemini API"]
+    ["Groq API", "OpenRouter", "Gemini API"]
 )
 
 # Model Listesi Tanımları
@@ -321,13 +321,13 @@ MODELS_MAP = {
 }
 
 selected_model_option = None
-consensus_mode = False
+consensus_mode = True
 models_config_list = []
 
 if api_provider_selection != "Kural Tabanlı (Çevrimdışı Fallback)":
     consensus_mode = st.sidebar.checkbox(
         "Çoklu LLM Mutabakat Analizi (Consensus Mode) 🎓",
-        value=False,
+        value=True,
         help="Aynı veya farklı sağlayıcılara ait 3 farklı model paralel olarak çalıştırılır. Sınıflandırmalar çoğunluk oylaması ile belirlenir ve Fleiss' Kappa akademik güvenilirlik skorları hesaplanır."
     )
     
