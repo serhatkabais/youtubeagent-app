@@ -283,11 +283,11 @@ if or_key and not or_key.startswith("your_") and len(or_key.strip()) > 10 and no
 gemini_fallback = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"]
 groq_fallback = ["llama-3.3-70b-versatile", "llama-3.1-70b-versatile", "mixtral-8x7b-32768", "llama-3.1-8b-instant"]
 or_fallback = [
-    "meta-llama/llama-3.3-70b-instruct:free", 
     "deepseek/deepseek-chat",
-    "qwen/qwen-2.5-72b-instruct:free", 
-    "google/gemma-2-9b-it:free", 
-    "meta-llama/llama-3.2-3b-instruct:free"
+    "meta-llama/llama-3.3-70b-instruct", 
+    "qwen/qwen-2.5-72b-instruct",
+    "google/gemini-flash-1.5",
+    "meta-llama/llama-3.1-8b-instruct"
 ]
 
 gemini_list = st.session_state.gemini_models if st.session_state.gemini_models else gemini_fallback
@@ -331,7 +331,10 @@ st.sidebar.markdown("### 🛠️ Mutabakat Modellerini Seç")
 st.sidebar.markdown("**1. Model Yapılandırması**")
 m1_prov = st.sidebar.selectbox("Sağlayıcı 1:", ["OpenRouter", "Gemini API", "Groq API"], key="m1_prov")
 m1_models_list, m1_key, m1_code = MODELS_MAP[m1_prov]
-m1_default_idx = get_model_index(m1_models_list, "llama-3.3-70b")
+m1_default_idx = get_model_index(m1_models_list, "deepseek-chat")
+if m1_default_idx == 0 and len(m1_models_list) > 0:
+    # If deepseek-chat not found in API list, search deepseek
+    m1_default_idx = get_model_index(m1_models_list, "deepseek")
 m1_choice = st.sidebar.selectbox("Model 1:", m1_models_list + ["Özel Model Gir (Custom)..."], index=m1_default_idx, key="m1_choice")
 m1_val = ""
 if m1_choice == "Özel Model Gir (Custom)...":
@@ -344,9 +347,10 @@ models_config_list.append({"provider": m1_code, "api_key": m1_key, "model": m1_v
 st.sidebar.markdown("**2. Model Yapılandırması**")
 m2_prov = st.sidebar.selectbox("Sağlayıcı 2:", ["OpenRouter", "Gemini API", "Groq API"], key="m2_prov")
 m2_models_list, m2_key, m2_code = MODELS_MAP[m2_prov]
-m2_default_idx = get_model_index(m2_models_list, "deepseek-chat")
+m2_default_idx = get_model_index(m2_models_list, "llama-3.3-70b-instruct")
 if m2_default_idx == 0:
-    m2_default_idx = get_model_index(m2_models_list, "qwen")
+    # try llama-3.3-70b
+    m2_default_idx = get_model_index(m2_models_list, "llama-3.3")
 if m2_default_idx == 0 and len(m2_models_list) > 1:
     m2_default_idx = 1
 m2_choice = st.sidebar.selectbox("Model 2:", m2_models_list + ["Özel Model Gir (Custom)..."], index=m2_default_idx, key="m2_choice")
@@ -361,9 +365,11 @@ models_config_list.append({"provider": m2_code, "api_key": m2_key, "model": m2_v
 st.sidebar.markdown("**3. Model Yapılandırması**")
 m3_prov = st.sidebar.selectbox("Sağlayıcı 3:", ["OpenRouter", "Gemini API", "Groq API"], key="m3_prov")
 m3_models_list, m3_key, m3_code = MODELS_MAP[m3_prov]
-m3_default_idx = get_model_index(m3_models_list, "gemma")
+m3_default_idx = get_model_index(m3_models_list, "qwen-2.5-72b-instruct")
 if m3_default_idx == 0:
-    m3_default_idx = get_model_index(m3_models_list, "llama-3.2")
+    m3_default_idx = get_model_index(m3_models_list, "qwen")
+if m3_default_idx == 0:
+    m3_default_idx = get_model_index(m3_models_list, "gemini-flash")
 if m3_default_idx == 0 and len(m3_models_list) > 2:
     m3_default_idx = 2
 m3_choice = st.sidebar.selectbox("Model 3:", m3_models_list + ["Özel Model Gir (Custom)..."], index=m3_default_idx, key="m3_choice")
