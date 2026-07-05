@@ -591,7 +591,8 @@ with tab_analiz:
                         st.session_state.analysis_result = analysis
                         st.success(f"Başarıyla {len(selected_comments)} yorum indirildi, SHA-256 ile maskelendi ve analiz edildi!")
                     except Exception as err:
-                        st.error(f"❌ Yapay Zekâ Analiz Hatası: {err}")
+                        st.error("❌ Yapay Zekâ Analiz Hatası:")
+                        st.code(str(err), language="text")
                         st.info("💡 Not: API hatası aldınız. API anahtarınızın veya seçtiğiniz model isminin doğruluğundan emin olun. Gerekirse 'Kural Tabanlı Analiz (Çevrimdışı Fallback)' yöntemini kullanabilirsiniz.")
                 else:
                     st.error("Yorumlar çekilemedi. Lütfen bağlantıyı kontrol edin veya videonun yorumlara açık olduğundan emin olun.")

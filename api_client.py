@@ -163,11 +163,24 @@ def _call_llm_api(provider, api_key, model, system_prompt, user_prompt, temperat
             ],
             "temperature": temperature
         }
-        res = requests.post(url, json=payload, headers=headers, timeout=90)
+        res = requests.post(url, json=payload, headers=headers, timeout=120)
         if res.status_code == 200:
-            return res.json()["choices"][0]["message"]["content"]
+            try:
+                res_json = res.json()
+            except Exception:
+                raise Exception(f"{provider.upper()} API (HTTP 200) HTML/Metin dondurdu (Beklenen JSON degil): {repr(res.text[:300])}")
+                
+            if "error" in res_json:
+                err_val = res_json["error"]
+                err_msg = err_val.get("message", str(err_val)) if isinstance(err_val, dict) else str(err_val)
+                raise Exception(f"{provider.upper()} API Hatasi: {err_msg}")
+                
+            if "choices" in res_json and len(res_json["choices"]) > 0:
+                return res_json["choices"][0]["message"]["content"]
+            else:
+                raise Exception(f"{provider.upper()} API beklenen formati ('choices') dondurmedi. Yanit: {repr(res.text[:300])}")
         else:
-            raise Exception(f"{provider.upper()} API Hatasi (HTTP {res.status_code}): {res.text[:500]}")
+            raise Exception(f"{provider.upper()} API Hatasi (HTTP {res.status_code}): {repr(res.text[:300])}")
 
     elif provider == "gemini":
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
@@ -176,16 +189,19 @@ def _call_llm_api(provider, api_key, model, system_prompt, user_prompt, temperat
             "contents": [{"parts": [{"text": user_prompt}]}],
             "generationConfig": {"temperature": temperature}
         }
-        res = requests.post(url, json=payload, timeout=90)
+        res = requests.post(url, json=payload, timeout=120)
         if res.status_code == 200:
-            res_json = res.json()
+            try:
+                res_json = res.json()
+            except Exception:
+                raise Exception(f"Gemini API (HTTP 200) HTML/Metin dondurdu: {repr(res.text[:300])}")
             if "candidates" in res_json and res_json["candidates"]:
                 candidate = res_json["candidates"][0]
                 if "content" in candidate and "parts" in candidate["content"] and candidate["content"]["parts"]:
                     return candidate["content"]["parts"][0]["text"]
-            raise Exception(f"Gemini API bos yanit dondurdu: {res.text[:500]}")
+            raise Exception(f"Gemini API bos yanit dondurdu: {repr(res.text[:300])}")
         else:
-            raise Exception(f"Gemini API Hatasi (HTTP {res.status_code}): {res.text[:500]}")
+            raise Exception(f"Gemini API Hatasi (HTTP {res.status_code}): {repr(res.text[:300])}")
 
     raise Exception(f"Desteklenmeyen saglayici: {provider}")
 
@@ -645,7 +661,10 @@ def analyze_comments_with_llm_consensus(comments, models_config, progress_callba
             try:
                 results[f"Model_{idx+1}"] = future.result()
             except Exception as e:
-                raise Exception(f"Model {model_name} (Sıra {idx+1}) analiz sırasında hata verdi: {str(e)}")
+                err_text = str(e)
+                if not err_text:
+                    err_text = repr(e)
+                raise Exception(f"Model {model_name} (Sira {idx+1}) analiz sirasinda hata verdi: {err_text}")
 
     m1_results = results["Model_1"]
     m2_results = results["Model_2"]
