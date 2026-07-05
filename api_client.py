@@ -163,24 +163,45 @@ def _call_llm_api(provider, api_key, model, system_prompt, user_prompt, temperat
             ],
             "temperature": temperature
         }
-        res = requests.post(url, json=payload, headers=headers, timeout=120)
-        if res.status_code == 200:
-            try:
-                res_json = res.json()
-            except Exception:
-                raise Exception(f"{provider.upper()} API (HTTP 200) HTML/Metin dondurdu (Beklenen JSON degil): {repr(res.text[:300])}")
-                
-            if "error" in res_json:
-                err_val = res_json["error"]
-                err_msg = err_val.get("message", str(err_val)) if isinstance(err_val, dict) else str(err_val)
-                raise Exception(f"{provider.upper()} API Hatasi: {err_msg}")
-                
-            if "choices" in res_json and len(res_json["choices"]) > 0:
-                return res_json["choices"][0]["message"]["content"]
+        MAX_RETRIES = 3
+        RETRY_DELAYS = [5, 15, 30]  # saniye
+        last_error = None
+        
+        for attempt in range(MAX_RETRIES + 1):
+            res = requests.post(url, json=payload, headers=headers, timeout=120)
+            
+            if res.status_code == 200:
+                try:
+                    res_json = res.json()
+                except Exception:
+                    raise Exception(f"{provider.upper()} API (HTTP 200) HTML/Metin dondurdu (Beklenen JSON degil): {repr(res.text[:300])}")
+                    
+                if "error" in res_json:
+                    err_val = res_json["error"]
+                    err_msg = err_val.get("message", str(err_val)) if isinstance(err_val, dict) else str(err_val)
+                    err_code = err_val.get("code", 0) if isinstance(err_val, dict) else 0
+                    # Retry on rate limit errors embedded in 200 responses
+                    if err_code in (429, 502, 503) and attempt < MAX_RETRIES:
+                        import time
+                        time.sleep(RETRY_DELAYS[attempt])
+                        continue
+                    raise Exception(f"{provider.upper()} API Hatasi: {err_msg}")
+                    
+                if "choices" in res_json and len(res_json["choices"]) > 0:
+                    return res_json["choices"][0]["message"]["content"]
+                else:
+                    raise Exception(f"{provider.upper()} API beklenen formati ('choices') dondurmedi. Yanit: {repr(res.text[:300])}")
+            
+            elif res.status_code in (429, 502, 503):
+                last_error = f"{provider.upper()} API Hatasi (HTTP {res.status_code}): {repr(res.text[:300])}"
+                if attempt < MAX_RETRIES:
+                    import time
+                    time.sleep(RETRY_DELAYS[attempt])
+                    continue
+                else:
+                    raise Exception(f"{last_error} (3 deneme sonrasi basarisiz)")
             else:
-                raise Exception(f"{provider.upper()} API beklenen formati ('choices') dondurmedi. Yanit: {repr(res.text[:300])}")
-        else:
-            raise Exception(f"{provider.upper()} API Hatasi (HTTP {res.status_code}): {repr(res.text[:300])}")
+                raise Exception(f"{provider.upper()} API Hatasi (HTTP {res.status_code}): {repr(res.text[:300])}")
 
     elif provider == "gemini":
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"

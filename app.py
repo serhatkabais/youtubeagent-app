@@ -331,9 +331,11 @@ st.sidebar.markdown("### 🛠️ Mutabakat Modellerini Seç")
 st.sidebar.markdown("**1. Model Yapılandırması**")
 m1_prov = st.sidebar.selectbox("Sağlayıcı 1:", ["OpenRouter", "Gemini API", "Groq API"], key="m1_prov")
 m1_models_list, m1_key, m1_code = MODELS_MAP[m1_prov]
-m1_default_idx = get_model_index(m1_models_list, "deepseek-chat")
-if m1_default_idx == 0 and len(m1_models_list) > 0:
-    # If deepseek-chat not found in API list, search deepseek
+# Ucuz pro model: deepseek/deepseek-chat (~$0.14/1M tokens)
+m1_default_idx = get_model_index(m1_models_list, "deepseek/deepseek-chat")
+if m1_default_idx == 0:
+    m1_default_idx = get_model_index(m1_models_list, "deepseek-chat")
+if m1_default_idx == 0:
     m1_default_idx = get_model_index(m1_models_list, "deepseek")
 m1_choice = st.sidebar.selectbox("Model 1:", m1_models_list + ["Özel Model Gir (Custom)..."], index=m1_default_idx, key="m1_choice")
 m1_val = ""
@@ -347,10 +349,12 @@ models_config_list.append({"provider": m1_code, "api_key": m1_key, "model": m1_v
 st.sidebar.markdown("**2. Model Yapılandırması**")
 m2_prov = st.sidebar.selectbox("Sağlayıcı 2:", ["OpenRouter", "Gemini API", "Groq API"], key="m2_prov")
 m2_models_list, m2_key, m2_code = MODELS_MAP[m2_prov]
-m2_default_idx = get_model_index(m2_models_list, "llama-3.3-70b-instruct")
+# Ucuz pro model: google/gemini-2.0-flash (~$0.10/1M tokens)
+m2_default_idx = get_model_index(m2_models_list, "google/gemini-2.0-flash")
 if m2_default_idx == 0:
-    # try llama-3.3-70b
-    m2_default_idx = get_model_index(m2_models_list, "llama-3.3")
+    m2_default_idx = get_model_index(m2_models_list, "gemini-2.0-flash")
+if m2_default_idx == 0:
+    m2_default_idx = get_model_index(m2_models_list, "gemini-flash")
 if m2_default_idx == 0 and len(m2_models_list) > 1:
     m2_default_idx = 1
 m2_choice = st.sidebar.selectbox("Model 2:", m2_models_list + ["Özel Model Gir (Custom)..."], index=m2_default_idx, key="m2_choice")
@@ -365,11 +369,12 @@ models_config_list.append({"provider": m2_code, "api_key": m2_key, "model": m2_v
 st.sidebar.markdown("**3. Model Yapılandırması**")
 m3_prov = st.sidebar.selectbox("Sağlayıcı 3:", ["OpenRouter", "Gemini API", "Groq API"], key="m3_prov")
 m3_models_list, m3_key, m3_code = MODELS_MAP[m3_prov]
-m3_default_idx = get_model_index(m3_models_list, "qwen-2.5-72b-instruct")
+# Ucuz pro model: qwen/qwen3-30b-a3b (~$0.14/1M tokens)
+m3_default_idx = get_model_index(m3_models_list, "qwen/qwen3-30b-a3b")
+if m3_default_idx == 0:
+    m3_default_idx = get_model_index(m3_models_list, "qwen3-30b")
 if m3_default_idx == 0:
     m3_default_idx = get_model_index(m3_models_list, "qwen")
-if m3_default_idx == 0:
-    m3_default_idx = get_model_index(m3_models_list, "gemini-flash")
 if m3_default_idx == 0 and len(m3_models_list) > 2:
     m3_default_idx = 2
 m3_choice = st.sidebar.selectbox("Model 3:", m3_models_list + ["Özel Model Gir (Custom)..."], index=m3_default_idx, key="m3_choice")
