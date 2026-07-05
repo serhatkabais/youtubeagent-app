@@ -648,13 +648,26 @@ def analyze_comments_with_llm_consensus(comments, models_config, progress_callba
                 progress_callback(avg_progress)
         return cb
 
-    def run_analysis(idx, cfg):
+    try:
+        from streamlit.runtime.scriptrunner.script_run_context import get_script_run_ctx
+        ctx = get_script_run_ctx()
+    except ImportError:
+        ctx = None
+
+    def run_analysis(idx, cfg, context):
+        try:
+            from streamlit.runtime.scriptrunner.script_run_context import add_script_run_ctx
+            import threading
+            if context:
+                add_script_run_ctx(threading.current_thread(), context)
+        except ImportError:
+            pass
         return analyze_comments_with_llm(
             comments, cfg["provider"], cfg["api_key"], cfg["model"], get_progress_wrapper(f"Model_{idx+1}")
         )
 
     with ThreadPoolExecutor(max_workers=3) as executor:
-        futures = {executor.submit(run_analysis, i, cfg): i for i, cfg in enumerate(models_config)}
+        futures = {executor.submit(run_analysis, i, cfg, ctx): i for i, cfg in enumerate(models_config)}
         for future in futures:
             idx = futures[future]
             model_name = models_config[idx]["model"]
