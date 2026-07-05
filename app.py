@@ -38,8 +38,10 @@ def format_model_options(models, provider):
 def parse_selected_model(option):
     if not option:
         return ""
-    if option.startswith("[FREE] ") or option.startswith("[PRO] "):
-        option = option[7:]
+    if option.startswith("[FREE] "):
+        return option[7:]
+    if option.startswith("[PRO] "):
+        return option[6:]
     return option
 
 # Sayfa Yapılandırması ve Akademik Tema
