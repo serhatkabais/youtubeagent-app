@@ -638,46 +638,40 @@ def analyze_comments_with_llm_consensus(comments, models_config, progress_callba
         raise Exception("Mutabakat analizi için en az 3 model gereklidir.")
 
     results = {}
+
+    def _safe_progress(value):
+        """Thread-safe progress callback - silently ignores Streamlit context errors."""
+        if not progress_callback:
+            return
+        try:
+            progress_callback(value)
+        except Exception:
+            pass  # NoSessionContext vb. hataları yut, analizi durdurma
+
     progress_states = {"Model_1": 0.0, "Model_2": 0.0, "Model_3": 0.0}
-    
+
     def get_progress_wrapper(model_idx_str):
         def cb(progress):
             progress_states[model_idx_str] = progress
-            if progress_callback:
-                avg_progress = sum(progress_states.values()) / 3.0
-                progress_callback(avg_progress)
+            avg_progress = sum(progress_states.values()) / 3.0
+            _safe_progress(avg_progress)
         return cb
 
-    try:
-        from streamlit.runtime.scriptrunner.script_run_context import get_script_run_ctx
-        ctx = get_script_run_ctx()
-    except ImportError:
-        ctx = None
-
-    def run_analysis(idx, cfg, context):
-        try:
-            from streamlit.runtime.scriptrunner.script_run_context import add_script_run_ctx
-            import threading
-            if context:
-                add_script_run_ctx(threading.current_thread(), context)
-        except ImportError:
-            pass
+    def run_analysis(idx, cfg):
         return analyze_comments_with_llm(
             comments, cfg["provider"], cfg["api_key"], cfg["model"], get_progress_wrapper(f"Model_{idx+1}")
         )
 
-    with ThreadPoolExecutor(max_workers=3) as executor:
-        futures = {executor.submit(run_analysis, i, cfg, ctx): i for i, cfg in enumerate(models_config)}
-        for future in futures:
-            idx = futures[future]
-            model_name = models_config[idx]["model"]
-            try:
-                results[f"Model_{idx+1}"] = future.result()
-            except Exception as e:
-                err_text = str(e)
-                if not err_text:
-                    err_text = repr(e)
-                raise Exception(f"Model {model_name} (Sira {idx+1}) analiz sirasinda hata verdi: {err_text}")
+    # Modelleri sırayla (sequential) çalıştır - Streamlit thread uyumsuzluğunu tamamen önler
+    for i, cfg in enumerate(models_config):
+        model_name = cfg["model"]
+        try:
+            results[f"Model_{i+1}"] = run_analysis(i, cfg)
+        except Exception as e:
+            err_text = str(e)
+            if not err_text:
+                err_text = repr(e)
+            raise Exception(f"Model {model_name} (Sira {i+1}) analiz sirasinda hata verdi: {err_text}")
 
     m1_results = results["Model_1"]
     m2_results = results["Model_2"]
