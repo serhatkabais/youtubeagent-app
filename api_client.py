@@ -256,7 +256,7 @@ def _parse_llm_json(raw_text):
 # GELISMIS SYSTEM PROMPT - YORUM ANALIZI
 # ============================================================
 
-SYSTEM_PROMPT_ANALYSIS = """Sen, Turkce cevrimici topluluklarin dilini, kulturel kodlarini ve retorik kaliplarini derinlemesine cozumleyen bir Dijital Etnografi ve Soylem Analizi Uzmanisin.
+SYSTEM_PROMPT_ANALYSIS_TR = """Sen, Turkce cevrimici topluluklarin dilini, kulturel kodlarini ve retorik kaliplarini derinlemesine cozumleyen bir Dijital Etnografi ve Soylem Analizi Uzmanisin.
 
 ## GOREV
 Sana verilen YouTube yorumlarini tek tek analiz edecek ve her biri icin yapilandirilmis bir JSON ciktisi ureteceksin.
@@ -319,6 +319,11 @@ Su kaliplari dogru analiz et:
 - "@kullanici sunu dene" -> Akran mentorlugu
 - "ilk yorum", sadece emoji -> Yuzeysel katilim
 
+### 7. DIL TESPITI VE CEVIRI (COK ONEMLI!)
+- Her yorumun yazildigi orijinal dili tespit et ve "original_lang" alaninda ISO kodu olarak belirt (Orn: "tr", "en", "es", "de").
+- Eger yorumun orijinal dili Turkce degilse, "translated_comment" alanina yorumun Turkce cevirisini yaz.
+- Eger yorum zaten Turkce ise, "translated_comment" alanini bos birak veya orijinal yorumu aynen yaz.
+
 ## CIKTI FORMATI
 Her yorum icin asagidaki JSON yapisini kullan. Yanitin SADECE gecerli bir JSON dizisi olmali, baska metin olmamali:
 
@@ -331,7 +336,91 @@ Her yorum icin asagidaki JSON yapisini kullan. Yanitin SADECE gecerli bir JSON d
     "role": "topluluk rolu",
     "rhetorical_devices": ["tespit edilen cihazlar"],
     "confidence": 0.85,
-    "reasoning": "Kisa Turkce aciklama"
+    "reasoning": "Kisa Turkce aciklama",
+    "original_lang": "tr|en|es|...",
+    "translated_comment": "Orijinal yorum Turkce degilse Turkce cevirisi"
+  }
+]"""
+
+SYSTEM_PROMPT_ANALYSIS_EN = """You are a Digital Ethnography and Discourse Analysis Expert analyzing online communities' language, cultural codes, and rhetorical patterns.
+
+## TASK
+You will analyze each YouTube comment provided and produce a structured JSON output for each.
+
+## CRITICAL INSTRUCTIONS
+
+### 1. Sentiment Analysis (sentiment)
+- "positive": Real positive sentiment (joy, gratitude, excitement)
+- "negative": Real negative sentiment (anger, disappointment, fear)
+- "neutral": Information sharing, asking questions, objective observation
+- "mixed": Both positive and negative sentiment in the same comment (e.g., "The tool is great but it will take our jobs")
+
+### 2. Emotional Tone (emotion)
+excitement, anxiety, disappointment, gratitude, curiosity, anger, irony, fear, hope, astonishment, weariness, skepticism, pride, nostalgia
+
+### 3. Category Taxonomy (category)
+Select the MOST APPROPRIATE from the following 12 categories:
+- "Excitement and Discovery Motivation": Excitement about the tool/topic, eager to try, positive surprise
+- "Professional Future Anxiety": Job loss, industry threat, "what will we do", future worry
+- "Ethic and Copyright Sensitivity": Theft of labor, copyright, unauthorized use, academic integrity
+- "Technical Issue and Support Seeking": Error, bug, "not working", parameter issue, technical question
+- "Cost and Accessibility Issue": API cost, search for free alternatives, price complaint
+- "Social Support and Gratitude": Community bond, gratitude, appreciation, thanks, "good job"
+- "Peer Mentorship and Guidance": Answering others' questions, sharing resources
+- "Creative Workflow Discussion": Integration of tools into workflow, production process
+- "Philosophical/Existential Inquiries": Nature of AI, consciousness, future of humanity, deep thoughts
+- "Irony, Satire or Sarcastic Comment": Mocking, satirical, implicit criticism, sarcastic praise
+- "Content Request and Suggestion": "Please cover this too", "keep it coming", video suggestions
+- "General Observation / Superficial Engagement": Short, out of context or superficial comments ("first comment", emoji)
+
+### 4. Community Role (role)
+- "Peer Mentor": Answering others, sharing resources, suggesting solutions
+- "Professional Practitioner": Talking about their own workflow, sharing experience
+- "Critical Thinker": Questioning ethical/philosophical aspects, presenting counter-arguments
+- "New Explorer / Curious": Eager to try, wanting to discover, asking questions
+- "Disappointed": Facing technical obstacles, complaining about cost
+- "Passive Supporter": Short thanks/appreciation, superficial participation
+- "Ironic Observer": Commenting with a mocking/sarcastic perspective
+
+### 5. Rhetorical Device Detection (rhetorical_devices)
+Detect any of the following if present:
+- "irony": Expression conveying the opposite of the literal meaning
+- "innuendo": Indirect, implicative criticism
+- "hyperbole": Exaggeration or understatement of the situation
+- "sarcastic_praise": Seeming to praise but actually criticizing
+- "rhetorical_question": Question asked to provoke thought without expecting an answer
+- "slang_use": Everyday colloquial speech, street talk
+- "emoji_emphasis": Using emoticons to reinforce meaning or tone
+
+### 6. INTERNET LANGUAGE KNOWLEDGE (VERY IMPORTANT!)
+Understand specific Turkish/English internet slangs and idioms correctly:
+- "abi cok iyi ya" or "bro this is so good" -> Genuine excitement (positive)
+- "resmen isimizi alacaklar" or "they are taking our jobs" -> Professional anxiety (negative)
+- "harika, artik calisana gerek yok" or "great, no need for workers anymore" -> Irony / sarcasm
+- "hocam eline saglik" or "thanks for your effort" -> Social support
+- "@username try this" -> Peer mentorship
+- "first comment", just emojis -> Superficial engagement
+
+### 7. LANGUAGE DETECTION AND TRANSLATION (VERY IMPORTANT!)
+- Detect each comment's original language and write it in the "original_lang" field as an ISO code (e.g., "tr", "en", "es", "de").
+- If the original language of the comment does NOT match English, provide a translation in English in the "translated_comment" field.
+- If the comment is already in English, you can leave "translated_comment" empty or copy the original comment.
+
+## OUTPUT FORMAT
+Use the following JSON structure for each comment. Your response must be ONLY a valid JSON array, nothing else:
+
+[
+  {
+    "id": 1,
+    "sentiment": "positive|negative|neutral|mixed",
+    "emotion": "main emotion",
+    "category": "taksonomi category",
+    "role": "community role",
+    "rhetorical_devices": ["detected devices"],
+    "confidence": 0.85,
+    "reasoning": "Short English explanation",
+    "original_lang": "tr|en|es|...",
+    "translated_comment": "English translation if original comment is not in English"
   }
 ]"""
 
@@ -340,10 +429,11 @@ Her yorum icin asagidaki JSON yapisini kullan. Yanitin SADECE gecerli bir JSON d
 # LLM-FIRST YORUM ANALIZI
 # ============================================================
 
-def analyze_comments_with_llm(comments, provider, api_key, model, progress_callback=None):
+def analyze_comments_with_llm(comments, provider, api_key, model, progress_callback=None, lang="tr"):
     """
     Yorumlari batch halinde LLM'e gondererek her biri icin yapilandirilmis
     analiz ciktisi alir. Ironi, kinaye, abarti gibi retorik cihazlari tespit eder.
+    Dil tespiti ve hedef dile (lang) gore ceviri yapar.
     """
     if not api_key:
         raise Exception("API anahtari bulunamadi veya bos.")
@@ -351,19 +441,19 @@ def analyze_comments_with_llm(comments, provider, api_key, model, progress_callb
     BATCH_SIZE = 8
     all_results = []
     total = len(comments)
+    system_prompt = SYSTEM_PROMPT_ANALYSIS_TR if lang == "tr" else SYSTEM_PROMPT_ANALYSIS_EN
 
     for batch_start in range(0, total, BATCH_SIZE):
         batch_end = min(batch_start + BATCH_SIZE, total)
         batch = comments[batch_start:batch_end]
 
-        user_prompt = f"Asagidaki {len(batch)} YouTube yorumunu analiz et:\n\n"
+        user_prompt = f"Asagidaki {len(batch)} YouTube yorumunu analiz et:\n\n" if lang == "tr" else f"Analyze the following {len(batch)} YouTube comments:\n\n"
         for i, c in enumerate(batch):
-            # Escape strings just in case
             comment_text = c.get("comment", "").replace('"', "'")
             user_prompt += f'[{i+1}] "{comment_text}"\n'
 
         try:
-            raw_response = _call_llm_api(provider, api_key, model, SYSTEM_PROMPT_ANALYSIS, user_prompt)
+            raw_response = _call_llm_api(provider, api_key, model, system_prompt, user_prompt)
             parsed = _parse_llm_json(raw_response)
 
             if parsed and isinstance(parsed, list):
@@ -371,26 +461,30 @@ def analyze_comments_with_llm(comments, provider, api_key, model, progress_callb
                     if idx < len(batch):
                         result["original_id"] = batch[idx].get("id", batch_start + idx + 1)
                         result["original_comment"] = batch[idx].get("comment", "")
-                        result.setdefault("sentiment", "notr")
-                        result.setdefault("emotion", "belirsiz")
-                        result.setdefault("category", "Genel Gozlem / Yuzeysel Katilim")
-                        result.setdefault("role", "Pasif Destekci")
+                        result.setdefault("sentiment", "notr" if lang == "tr" else "neutral")
+                        result.setdefault("emotion", "belirsiz" if lang == "tr" else "undetermined")
+                        result.setdefault("category", "Genel Gozlem / Yuzeysel Katilim" if lang == "tr" else "General Observation / Superficial Engagement")
+                        result.setdefault("role", "Pasif Destekci" if lang == "tr" else "Passive Supporter")
                         result.setdefault("rhetorical_devices", [])
                         result.setdefault("confidence", 0.5)
                         result.setdefault("reasoning", "")
+                        result.setdefault("original_lang", "tr" if lang == "tr" else "en")
+                        result.setdefault("translated_comment", "")
                 all_results.extend(parsed[:len(batch)])
             else:
                 for idx, c in enumerate(batch):
                     all_results.append({
                         "original_id": c.get("id", batch_start + idx + 1),
                         "original_comment": c.get("comment", ""),
-                        "sentiment": "notr",
-                        "emotion": "belirsiz",
-                        "category": "Genel Gozlem / Yuzeysel Katilim",
-                        "role": "Pasif Destekci",
+                        "sentiment": "notr" if lang == "tr" else "neutral",
+                        "emotion": "belirsiz" if lang == "tr" else "undetermined",
+                        "category": "Genel Gozlem / Yuzeysel Katilim" if lang == "tr" else "General Observation / Superficial Engagement",
+                        "role": "Pasif Destekci" if lang == "tr" else "Passive Supporter",
                         "rhetorical_devices": [],
                         "confidence": 0.0,
-                        "reasoning": "LLM ciktisi ayristirilamadi."
+                        "reasoning": "LLM ciktisi ayristirilamadi." if lang == "tr" else "LLM output could not be parsed.",
+                        "original_lang": "tr" if lang == "tr" else "en",
+                        "translated_comment": ""
                     })
         except Exception as e:
             raise Exception(f"Batch {batch_start+1}-{batch_end} analiz hatasi: {str(e)}")
@@ -405,7 +499,7 @@ def analyze_comments_with_llm(comments, provider, api_key, model, progress_callb
 # LLM RAPOR URETICI
 # ============================================================
 
-def get_llm_report(meta, statistics, comments_sample, provider, api_key, model, llm_analysis_results=None):
+def get_llm_report(meta, statistics, comments_sample, provider, api_key, model, llm_analysis_results=None, lang="tr"):
     """
     LLM analiz sonuclarini sentezleyerek kapsamli bir etnografik rapor uretir.
     """
@@ -420,15 +514,16 @@ def get_llm_report(meta, statistics, comments_sample, provider, api_key, model, 
         mixed_comments = []
 
         for r in llm_analysis_results:
-            cat = r.get("category", "Diger")
+            cat = r.get("category", "Diger" if lang == "tr" else "Other")
             category_dist[cat] = category_dist.get(cat, 0) + 1
-            role = r.get("role", "Diger")
+            role = r.get("role", "Diger" if lang == "tr" else "Other")
             role_dist[role] = role_dist.get(role, 0) + 1
-            sent = r.get("sentiment", "notr")
+            sent = r.get("sentiment", "notr" if lang == "tr" else "neutral")
             sentiment_dist[sent] = sentiment_dist.get(sent, 0) + 1
-            if "ironi" in r.get("rhetorical_devices", []) or "kinaye" in r.get("rhetorical_devices", []):
+            rhet = r.get("rhetorical_devices", [])
+            if any(x in rhet for x in ["ironi", "kinaye", "ironic", "sarcastic", "irony"]):
                 ironic_comments.append(r)
-            if sent == "karisik":
+            if sent in ("karisik", "mixed"):
                 mixed_comments.append(r)
 
         sorted_results = sorted(llm_analysis_results, key=lambda x: x.get("confidence", 0), reverse=True)
@@ -442,30 +537,30 @@ def get_llm_report(meta, statistics, comments_sample, provider, api_key, model, 
             if len(interesting_examples) >= 15:
                 break
 
-        prompt = f"Asagidaki YouTube videosu altindaki {statistics.get('total')} yorumun yapay zeka destekli derinlemesine analizini sentezleyerek akademik tonda Turkce bir rapor yaz.\n\n"
-        prompt += f"## VIDEO BILGILERI\n- Baslik: {meta.get('title')}\n- Yayinci: {meta.get('uploader')}\n- Izlenme: {meta.get('views')}\n\n"
-        prompt += f"## LLM ANALIZ SONUCLARI\n\n### Duygu Dagilimi:\n{json.dumps(sentiment_dist, ensure_ascii=False, indent=2)}\n\n"
-        prompt += f"### Kategori Dagilimi:\n{json.dumps(category_dist, ensure_ascii=False, indent=2)}\n\n"
-        prompt += f"### Topluluk Rolu Dagilimi:\n{json.dumps(role_dist, ensure_ascii=False, indent=2)}\n\n"
+        if lang == "tr":
+            prompt = f"Asagidaki YouTube videosu altindaki {statistics.get('total')} yorumun yapay zeka destekli derinlemesine analizini sentezleyerek akademik tonda Turkce bir rapor yaz.\n\n"
+            prompt += f"## VIDEO BILGILERI\n- Baslik: {meta.get('title')}\n- Yayinci: {meta.get('uploader')}\n- Izlenme: {meta.get('views')}\n\n"
+            prompt += f"## LLM ANALIZ SONUCLARI\n\n### Duygu Dagilimi:\n{json.dumps(sentiment_dist, ensure_ascii=False, indent=2)}\n\n"
+            prompt += f"### Kategori Dagilimi:\n{json.dumps(category_dist, ensure_ascii=False, indent=2)}\n\n"
+            prompt += f"### Topluluk Rolu Dagilimi:\n{json.dumps(role_dist, ensure_ascii=False, indent=2)}\n\n"
 
-        if ironic_comments:
-            prompt += f"### Ironi/Kinaye Iceren Yorumlar ({len(ironic_comments)} adet):\n"
-            for ic in ironic_comments[:5]:
-                prompt += f'- "{ic.get("original_comment", "")[:120]}" -> {ic.get("reasoning", "")}\n'
-            prompt += "\n"
+            if ironic_comments:
+                prompt += f"### Ironi/Kinaye Iceren Yorumlar ({len(ironic_comments)} adet):\n"
+                for ic in ironic_comments[:5]:
+                    prompt += f'- "{ic.get("original_comment", "")[:120]}" -> {ic.get("reasoning", "")}\n'
+                prompt += "\n"
 
-        if mixed_comments:
-            prompt += f"### Karisik Duygulu Yorumlar ({len(mixed_comments)} adet):\n"
-            for mc in mixed_comments[:5]:
-                prompt += f'- "{mc.get("original_comment", "")[:120]}" -> {mc.get("reasoning", "")}\n'
-            prompt += "\n"
+            if mixed_comments:
+                prompt += f"### Karisik Duygulu Yorumlar ({len(mixed_comments)} adet):\n"
+                for mc in mixed_comments[:5]:
+                    prompt += f'- "{mc.get("original_comment", "")[:120]}" -> {mc.get("reasoning", "")}\n'
+                prompt += "\n"
 
-        prompt += "### Dikkat Cekici Yorum Ornekleri:\n"
-        for ex in interesting_examples[:10]:
-            prompt += f'- [{ex.get("category")}] [{ex.get("sentiment")}] "{ex.get("original_comment", "")[:120]}" -> {ex.get("reasoning", "")}\n'
+            prompt += "### Dikkat Cekici Yorum Ornekleri:\n"
+            for ex in interesting_examples[:10]:
+                prompt += f'- [{ex.get("category")}] [{ex.get("sentiment")}] "{ex.get("original_comment", "")[:120]}" -> {ex.get("reasoning", "")}\n'
 
-        prompt += f"""
-
+            prompt += f"""
 ## RAPOR TALIMATLARI
 
 Lutfen bu verileri sentezleyerek su basliklari iceren zengin, derinlemesine, akademik tonda bir Turkce rapor yaz:
@@ -488,29 +583,93 @@ Somut, uygulanabilir mudahale onerileri sun.
 En sona su etik uyariyi ekle:
 > **Degerlendirme ve Etik Sinir Uyarisi:** Bu rapor, cevrimici toplulugun dil jargonlari ve davranissal ayak izlerinin yapay zeka destekli otomatik analizi ile uretilmistir. Bu veriler kesin birer hukum teskil etmez.
 """
+        else:
+            prompt = f"Write an academic, deep qualitative ethnographic synthesis report in English, analyzing the {statistics.get('total')} YouTube comments under the video described below.\n\n"
+            prompt += f"## VIDEO METADATA\n- Title: {meta.get('title')}\n- Publisher: {meta.get('uploader')}\n- Views: {meta.get('views')}\n\n"
+            prompt += f"## LLM ANALYSIS STATISTICS\n\n### Sentiment Distribution:\n{json.dumps(sentiment_dist, ensure_ascii=False, indent=2)}\n\n"
+            prompt += f"### Category Distribution:\n{json.dumps(category_dist, ensure_ascii=False, indent=2)}\n\n"
+            prompt += f"### Community Role Distribution:\n{json.dumps(role_dist, ensure_ascii=False, indent=2)}\n\n"
+
+            if ironic_comments:
+                prompt += f"### Comments with Irony/Sarcasm ({len(ironic_comments)} items):\n"
+                for ic in ironic_comments[:5]:
+                    prompt += f'- "{ic.get("original_comment", "")[:120]}" -> {ic.get("reasoning", "")}\n'
+                prompt += "\n"
+
+            if mixed_comments:
+                prompt += f"### Comments with Mixed Sentiment ({len(mixed_comments)} items):\n"
+                for mc in mixed_comments[:5]:
+                    prompt += f'- "{mc.get("original_comment", "")[:120]}" -> {mc.get("reasoning", "")}\n'
+                prompt += "\n"
+
+            prompt += "### Notable Comment Examples:\n"
+            for ex in interesting_examples[:10]:
+                prompt += f'- [{ex.get("category")}] [{ex.get("sentiment")}] "{ex.get("original_comment", "")[:120]}" -> {ex.get("reasoning", "")}\n'
+
+            prompt += f"""
+## REPORT INSTRUCTIONS
+
+Please synthesize this data and write a rich, deep, academic-toned report in English containing the following headings:
+
+### Community Profile and General Emotion Map
+Interpret the sentiment distribution. Evaluate positive/negative/mixed ratios. Describe the general atmosphere of the community.
+
+### Thematic Analysis and Category Evaluation
+Which themes are dominant? What kind of community profile emerges from the category distribution? What are the dominant anxieties and motivations?
+
+### Rhetorical and Subtext Analysis
+Detail irony, innuendo, and sarcastic comments. How do these rhetorical tools mask the community's true feelings?
+
+### Community Dynamics and Role Structure
+What is the peer mentorship rate? Do critical thinkers or passive supporters dominate?
+
+### Roadmap for Content Creators and Researchers
+Provide concrete, actionable intervention recommendations.
+
+Add the following ethical warning at the very end:
+> **Evaluation and Ethical Boundaries Warning:** This report has been generated using AI-assisted automated analysis of online community jargon and behavioral footprints. These data do not constitute a definitive judgment.
+"""
     else:
-        prompt = f"Sen bir Cevrimici Izleyici Topluluklari Iklim ve Jargon Cozumleyicisisin.\n"
-        prompt += f"Asagidaki video ve topluluk istatistiklerine gore derinlemesine nitel bir izleyici ve siber-kulturel iklim degerlendirmesi raporu yaz.\n\n"
-        prompt += f"VIDEO BILGILERI:\n- Baslik: {meta.get('title')}\n- Yayinci: {meta.get('uploader')}\n- Izlenme: {meta.get('views')}\n\n"
-        prompt += f"SAYISAL ISTATISTIKLER:\n"
-        prompt += f"- Toplam Analiz Edilen Yorum: {statistics.get('total')}\n"
-        prompt += f"- Kulturel Kaygi Orani: %{statistics.get('kaygi', 0):.1f}\n"
-        prompt += f"- Akran Mentorlugu Orani: %{statistics.get('mentor', 0):.1f}\n"
-        prompt += f"- Motivasyon/Cosku Orani: %{statistics.get('cosku', 0):.1f}\n"
-        prompt += f"- Teknik Tikanma/Hata Orani: %{statistics.get('hata', 0):.1f}\n"
-        prompt += f"- Elestirel Suphecilik Orani: %{statistics.get('etik', 0):.1f}\n"
-        prompt += f"- Sosyal Destek/Tesekkur Orani: %{statistics.get('destek', 0):.1f}\n"
-        prompt += f"- Topluluk Indeksi: {statistics.get('indeks')}\n\n"
-        prompt += "YORUM ORNEKLERI:\n"
-        for c in comments_sample[:15]:
-            prompt += f"- {c.get('comment', '')}\n"
-        prompt += "\nLutfen bu verileri sentezleyerek zengin, akademik tonda Turkce bir rapor yaz.\n"
+        if lang == "tr":
+            prompt = f"Sen bir Cevrimici Izleyici Topluluklari Iklim ve Jargon Cozumleyicisisin.\n"
+            prompt += f"Asagidaki video ve topluluk istatistiklerine gore derinlemesine nitel bir izleyici ve siber-kulturel iklim degerlendirmesi raporu yaz.\n\n"
+            prompt += f"VIDEO BILGILERI:\n- Baslik: {meta.get('title')}\n- Yayinci: {meta.get('uploader')}\n- Izlenme: {meta.get('views')}\n\n"
+            prompt += f"SAYISAL ISTATISTIKLER:\n"
+            prompt += f"- Toplam Analiz Edilen Yorum: {statistics.get('total')}\n"
+            prompt += f"- Kulturel Kaygi Orani: %{statistics.get('kaygi', 0):.1f}\n"
+            prompt += f"- Akran Mentorlugu Orani: %{statistics.get('mentor', 0):.1f}\n"
+            prompt += f"- Motivasyon/Cosku Orani: %{statistics.get('cosku', 0):.1f}\n"
+            prompt += f"- Teknik Tikanma/Hata Orani: %{statistics.get('hata', 0):.1f}\n"
+            prompt += f"- Elestirel Suphecilik Orani: %{statistics.get('etik', 0):.1f}\n"
+            prompt += f"- Sosyal Destek/Tesekkur Orani: %{statistics.get('destek', 0):.1f}\n"
+            prompt += f"- Topluluk Indeksi: {statistics.get('indeks')}\n\n"
+            prompt += "YORUM ORNEKLERI:\n"
+            for c in comments_sample[:15]:
+                prompt += f"- {c.get('comment', '')}\n"
+            prompt += "\nLutfen bu verileri sentezleyerek zengin, akademik tonda Turkce bir rapor yaz.\n"
+        else:
+            prompt = f"You are an Online Audience Communities Climate and Jargon Analyzer.\n"
+            prompt += f"Write an in-depth qualitative audience and cyber-cultural climate evaluation report in English based on the video and community statistics below.\n\n"
+            prompt += f"VIDEO INFORMATION:\n- Title: {meta.get('title')}\n- Publisher: {meta.get('uploader')}\n- Views: {meta.get('views')}\n\n"
+            prompt += f"NUMERICAL STATISTICS:\n"
+            prompt += f"- Total Comments Analyzed: {statistics.get('total')}\n"
+            prompt += f"- Cultural Anxiety Ratio: %{statistics.get('kaygi', 0):.1f}\n"
+            prompt += f"- Peer Mentorship Ratio: %{statistics.get('mentor', 0):.1f}\n"
+            prompt += f"- Motivation/Discovery Ratio: %{statistics.get('cosku', 0):.1f}\n"
+            prompt += f"- Technical Blocker/Error Ratio: %{statistics.get('hata', 0):.1f}\n"
+            prompt += f"- Critical Skepticism Ratio: %{statistics.get('etik', 0):.1f}\n"
+            prompt += f"- Social Support/Gratitude Ratio: %{statistics.get('destek', 0):.1f}\n"
+            prompt += f"- Community Index: {statistics.get('indeks')}\n\n"
+            prompt += "COMMENT EXAMPLES:\n"
+            for c in comments_sample[:15]:
+                prompt += f"- {c.get('comment', '')}\n"
+            prompt += "\nPlease synthesize this data and write a rich, academic-toned report in English.\n"
 
     try:
-        system_msg = "Sen bir Dijital Etnografi ve Soylem Analizi Uzmanisin. Turkce akademik tonda yazarsin."
+        system_msg = "Sen bir Dijital Etnografi ve Soylem Analizi Uzmanisin. Turkce akademik tonda yazarsin." if lang == "tr" else "You are a Digital Ethnography and Discourse Analysis Expert. You write in a professional academic English tone."
         return _call_llm_api(provider, api_key, model, system_msg, prompt, temperature=0.5)
     except Exception as e:
-        raise Exception(f"Rapor uretim hatasi ({provider}): {str(e)}")
+        raise Exception(f"Rapor uretim hatasi ({provider}): {str(e)}" if lang == "tr" else f"Report generation error ({provider}): {str(e)}")
 
 
 # ============================================================
@@ -625,19 +784,34 @@ def calculate_fleiss_kappa(ratings_matrix):
     kappa = (P_mean - P_e) / (1.0 - P_e)
     return kappa
 
-def interpret_kappa(kappa):
+def interpret_kappa(kappa, lang="tr"):
     """Kappa skorunun akademik yorumunu döner."""
-    if kappa < 0:
-        return "Uyuşma Yok / Rastgele"
-    elif kappa <= 0.20:
-        return "Önemsiz Derecede Uyuşum (Slight Agreement)"
-    elif kappa <= 0.40:
-        return "Kabul Edilebilir Derecede Uyuşum (Fair Agreement)"
-    elif kappa <= 0.60:
-        return "Orta Derecede Uyuşum (Moderate Agreement)"
-    elif kappa <= 0.80:
-        return "Önemli Derecede Uyuşum (Substantial Agreement)"
+    if lang == "tr":
+        if kappa < 0:
+            return "Uyuşma Yok / Rastgele"
+        elif kappa <= 0.20:
+            return "Önemsiz Derecede Uyuşum (Slight Agreement)"
+        elif kappa <= 0.40:
+            return "Kabul Edilebilir Derecede Uyuşum (Fair Agreement)"
+        elif kappa <= 0.60:
+            return "Orta Derecede Uyuşum (Moderate Agreement)"
+        elif kappa <= 0.80:
+            return "Önemli Derecede Uyuşum (Substantial Agreement)"
+        else:
+            return "Neredeyse Mükemmel Uyuşum (Almost Perfect Agreement)"
     else:
+        if kappa < 0:
+            return "No Agreement / Random"
+        elif kappa <= 0.20:
+            return "Slight Agreement"
+        elif kappa <= 0.40:
+            return "Fair Agreement"
+        elif kappa <= 0.60:
+            return "Moderate Agreement"
+        elif kappa <= 0.80:
+            return "Substantial Agreement"
+        else:
+            return "Almost Perfect Agreement"
         return "Neredeyse Mükemmel Uyuşum (Almost Perfect Agreement)"
 
 def _get_consensus_value(val1, val2, val3):
@@ -650,13 +824,13 @@ def _get_consensus_value(val1, val2, val3):
     else:
         return val1, 1 # uyuşmazlık durumunda birincil modelin tahmini, 1 oy
 
-def analyze_comments_with_llm_consensus(comments, models_config, progress_callback=None):
+def analyze_comments_with_llm_consensus(comments, models_config, progress_callback=None, lang="tr"):
     """
     3 farklı modelle yorumları paralel analiz eder ve çoğunluk kararına göre birleştirir.
     models_config: list of 3 dicts: [{'provider': '...', 'api_key': '...', 'model': '...'}, ...]
     """
     if len(models_config) < 3:
-        raise Exception("Mutabakat analizi için en az 3 model gereklidir.")
+        raise Exception("Mutabakat analizi için en az 3 model gereklidir." if lang == "tr" else "At least 3 models are required for consensus analysis.")
 
     results = {}
 
@@ -680,7 +854,7 @@ def analyze_comments_with_llm_consensus(comments, models_config, progress_callba
 
     def run_analysis(idx, cfg):
         return analyze_comments_with_llm(
-            comments, cfg["provider"], cfg["api_key"], cfg["model"], get_progress_wrapper(f"Model_{idx+1}")
+            comments, cfg["provider"], cfg["api_key"], cfg["model"], get_progress_wrapper(f"Model_{idx+1}"), lang=lang
         )
 
     # Modelleri sırayla (sequential) çalıştır - Streamlit thread uyumsuzluğunu tamamen önler
@@ -692,7 +866,7 @@ def analyze_comments_with_llm_consensus(comments, models_config, progress_callba
             err_text = str(e)
             if not err_text:
                 err_text = repr(e)
-            raise Exception(f"Model {model_name} (Sira {i+1}) analiz sirasinda hata verdi: {err_text}")
+            raise Exception(f"Model {model_name} (Sira {i+1}) analiz sirasinda hata verdi: {err_text}" if lang == "tr" else f"Model {model_name} (Row {i+1}) failed during analysis: {err_text}")
 
     m1_results = results["Model_1"]
     m2_results = results["Model_2"]
@@ -726,22 +900,22 @@ def analyze_comments_with_llm_consensus(comments, models_config, progress_callba
 
         min_votes = min(sent_votes, cat_votes, role_votes)
         if sent_votes == 3 and cat_votes == 3 and role_votes == 3:
-            agreement_level = "Tam Mutabakat"
+            agreement_level = "Tam Mutabakat" if lang == "tr" else "Full Consensus"
         elif min_votes == 1:
-            agreement_level = "Uyuşmazlık"
+            agreement_level = "Uyuşmazlık" if lang == "tr" else "Disagreement"
         else:
-            agreement_level = "Çoğunluk Kararı"
+            agreement_level = "Çoğunluk Kararı" if lang == "tr" else "Majority Decision"
 
         consensus_results.append({
             "original_id": c1["original_id"],
             "original_comment": c1["original_comment"],
             "sentiment": sent_val,
-            "emotion": c1.get("emotion", "belirsiz"),
+            "emotion": c1.get("emotion", "belirsiz" if lang == "tr" else "undetermined"),
             "category": cat_val,
             "role": role_val,
             "rhetorical_devices": list(set(c1.get("rhetorical_devices", []) + c2.get("rhetorical_devices", []) + c3.get("rhetorical_devices", []))),
             "confidence": round((sent_votes + cat_votes + role_votes) / 9.0, 2),
-            "reasoning": f"Modeller arası mutabakat: {agreement_level}. Model 1 Gerekçesi: {c1.get('reasoning', '')}",
+            "reasoning": f"Modeller arası mutabakat: {agreement_level}. Model 1 Gerekçesi: {c1.get('reasoning', '')}" if lang == "tr" else f"Consensus level: {agreement_level}. Model 1 Reasoning: {c1.get('reasoning', '')}",
             "consensus_details": {
                 "agreement_level": agreement_level,
                 "votes": {
@@ -749,23 +923,25 @@ def analyze_comments_with_llm_consensus(comments, models_config, progress_callba
                     "category": {lbl1: c1["category"], lbl2: c2["category"], lbl3: c3["category"]},
                     "role": {lbl1: c1["role"], lbl2: c2["role"], lbl3: c3["role"]}
                 }
-            }
+            },
+            "original_lang": c1.get("original_lang", "tr" if lang == "tr" else "en"),
+            "translated_comment": c1.get("translated_comment", "")
         })
 
     kappa_sent = calculate_fleiss_kappa(ratings_sentiment)
     kappa_cat = calculate_fleiss_kappa(ratings_category)
     kappa_role = calculate_fleiss_kappa(ratings_role)
 
-    consensus_count = sum(1 for r in consensus_results if r["consensus_details"]["agreement_level"] in ["Tam Mutabakat", "Çoğunluk Kararı"])
+    consensus_count = sum(1 for r in consensus_results if r["consensus_details"]["agreement_level"] in ["Tam Mutabakat", "Çoğunluk Kararı" if lang == "tr" else "Full Consensus", "Majority Decision"])
     consensus_rate = (consensus_count / len(comments)) * 100 if len(comments) > 0 else 0.0
 
     stats = {
         "fleiss_kappa_sentiment": round(kappa_sent, 3),
         "fleiss_kappa_category": round(kappa_cat, 3),
         "fleiss_kappa_role": round(kappa_role, 3),
-        "fleiss_kappa_sentiment_text": interpret_kappa(kappa_sent),
-        "fleiss_kappa_category_text": interpret_kappa(kappa_cat),
-        "fleiss_kappa_role_text": interpret_kappa(kappa_role),
+        "fleiss_kappa_sentiment_text": interpret_kappa(kappa_sent, lang),
+        "fleiss_kappa_category_text": interpret_kappa(kappa_cat, lang),
+        "fleiss_kappa_role_text": interpret_kappa(kappa_role, lang),
         "consensus_rate": round(consensus_rate, 1)
     }
 

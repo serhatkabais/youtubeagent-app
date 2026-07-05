@@ -21,38 +21,38 @@ class IklimAynasiAgent:
             "detay": detay
         })
 
-    def video_analiz_et(self, yorumlar, meta=None, api_info=None):
+    def video_analiz_et(self, yorumlar, meta=None, api_info=None, lang="tr"):
         """
         [KARAR AKIŞI] Tek bir video için yorumları analiz eder, 
         uygun araçları tetikler ve sonuçları birleştirir.
         Gelişmiş LLM API'si (Gemini/Groq/OpenRouter) mevcutsa nitel 
         pedagojik raporu LLM ile yazar, yoksa kural tabanlı template kullanır.
         """
-        self.log_action("Analiz Başladı", f"Yorumların analizi tetiklendi. Yorum sayısı: {len(yorumlar)}")
+        self.log_action("Analiz Başladı" if lang == "tr" else "Analysis Started", f"Yorumların analizi tetiklendi. Yorum sayısı: {len(yorumlar)}" if lang == "tr" else f"Comment analysis triggered. Number of comments: {len(yorumlar)}")
         
         # Karar Akışı: Veri boşsa doğrudan durdur
         if not yorumlar:
-            self.log_action("Hata", "Gelen veri kümesi boş.")
+            self.log_action("Hata" if lang == "tr" else "Error", "Gelen veri kümesi boş." if lang == "tr" else "Incoming dataset is empty.")
             return None
             
         # Topluluk Türünün Otomatik Tespiti
-        self.log_action("Topluluk Türü Tespiti", "Yorum kelimelerine göre topluluk türü analiz ediliyor...")
+        self.log_action("Topluluk Türü Tespiti" if lang == "tr" else "Community Type Detection", "Yorum kelimelerine göre topluluk türü analiz ediliyor..." if lang == "tr" else "Analyzing community type based on comment words...")
         topluluk_turu = topluluk_turu_tespit_et(yorumlar)
-        turu_str = "Genel / Karma Eğitim Topluluğu"
+        turu_str = "Genel / Karma Eğitim Topluluğu" if lang == "tr" else "General / Mixed Education Community"
         
-        self.log_action("Topluluk Türü Saptandı", f"Otomatik saptanan tür: {turu_str}")
+        self.log_action("Topluluk Türü Saptandı" if lang == "tr" else "Community Type Detected", f"Otomatik saptanan tür: {turu_str}")
         
         # Araç 1'in Tetiklenmesi (Duygu ve Kaygı Analizi)
-        self.log_action("Araç Tetikleme", f"duygu_ve_kaygi_analizi() çağrılıyor. (Tür: {topluluk_turu})")
+        self.log_action("Araç Tetikleme" if lang == "tr" else "Tool Triggering", f"duygu_ve_kaygi_analizi() çağrılıyor. (Tür: {topluluk_turu})" if lang == "tr" else f"Calling duygu_ve_kaygi_analizi(). (Type: {topluluk_turu})")
         duygu_sonuclari = duygu_ve_kaygi_analizi(yorumlar, topluluk_turu)
         
         # Araç 2'nin Tetiklenmesi (Topluluk Rol Dedektörü)
-        self.log_action("Araç Tetikleme", f"dijital_rol_dedektoru() çağrılıyor. (Tür: {topluluk_turu})")
+        self.log_action("Araç Tetikleme" if lang == "tr" else "Tool Triggering", f"dijital_rol_dedektoru() çağrılıyor. (Tür: {topluluk_turu})" if lang == "tr" else f"Calling dijital_rol_dedektoru(). (Type: {topluluk_turu})")
         rol_sonuclari = dijital_rol_dedektoru(yorumlar, topluluk_turu)
         
         # Künye ve API Bilgilerini kontrol et / doldur
         if not meta:
-            meta = {"title": "Bilinmeyen Video", "uploader": "Bilinmeyen Kanal", "views": "Bilinmiyor"}
+            meta = {"title": "Bilinmeyen Video" if lang == "tr" else "Unknown Video", "uploader": "Bilinmeyen Kanal" if lang == "tr" else "Unknown Channel", "views": "Bilinmiyor" if lang == "tr" else "Unknown"}
             
         if not api_info:
             from api_client import test_api_connection
@@ -71,7 +71,7 @@ class IklimAynasiAgent:
                 active_p, active_k = "gemini", gemini_key
                 
             if active_p and active_k:
-                self.log_action("API Algılandı", f"Aktif servis: {active_p}. Model test ediliyor...")
+                self.log_action("API Algılandı" if lang == "tr" else "API Detected", f"Aktif servis: {active_p}. Model test ediliyor..." if lang == "tr" else f"Active service: {active_p}. Testing model...")
                 success, resolved_model, msg = test_api_connection(active_p, active_k)
                 if success:
                     api_info = {
@@ -79,13 +79,13 @@ class IklimAynasiAgent:
                         "api_key": active_k,
                         "model": resolved_model
                     }
-                    self.log_action("API Test Başarılı", f"Saptanan model: {resolved_model}")
+                    self.log_action("API Test Başarılı" if lang == "tr" else "API Test Success", f"Saptanan model: {resolved_model}")
                 else:
-                    self.log_action("API Test Hatası", f"{msg}. Çevrimdışı modda devam ediliyor.")
+                    self.log_action("API Test Hatası" if lang == "tr" else "API Test Error", f"{msg}. Çevrimdışı modda devam ediliyor." if lang == "tr" else f"{msg}. Proceeding in offline mode.")
         
         # Raporlama Aşaması
         akademik_rapor = None
-        model_info = "Kural Tabanlı Analiz (Çevrimdışı Fallback)"
+        model_info = "Kural Tabanlı Analiz (Çevrimdışı Fallback)" if lang == "tr" else "Rule-Based Analysis (Offline Fallback)"
         llm_analysis_results = None
         
         if api_info and (api_info.get("api_key") or (api_info.get("consensus_mode") and api_info.get("models_config"))):
@@ -95,33 +95,43 @@ class IklimAynasiAgent:
                 progress_cb = None
                 if "progress_callback" in api_info:
                     progress_cb = api_info["progress_callback"]
-
+ 
                 consensus_stats = None
-
+ 
                 if api_info.get("consensus_mode") and api_info.get("models_config"):
                     models_config = api_info["models_config"]
                     models_names = [cfg["model"] for cfg in models_config]
-                    self.log_action("Nitel Raporlama (Mutabakat Modu)", f"Paralel modeller çağrılıyor: {', '.join(models_names)}")
+                    self.log_action("Nitel Raporlama (Mutabakat Modu)" if lang == "tr" else "Qualitative Reporting (Consensus Mode)", f"Paralel modeller çağrılıyor: {', '.join(models_names)}" if lang == "tr" else f"Calling parallel models: {', '.join(models_names)}")
                     llm_analysis_results, consensus_stats = analyze_comments_with_llm_consensus(
-                        yorumlar, models_config, progress_cb
+                        yorumlar, models_config, progress_cb, lang=lang
                     )
-                    model_info = f"Çoklu LLM Mutabakat Modu ({', '.join(models_names)})"
+                    model_info = f"Çoklu LLM Mutabakat Modu ({', '.join(models_names)})" if lang == "tr" else f"Multi-LLM Consensus Mode ({', '.join(models_names)})"
                 else:
-                    self.log_action("Nitel Raporlama", f"{api_info['provider']} ({api_info['model']}) üzerinden detaylı analiz başlıyor...")
+                    self.log_action("Nitel Raporlama" if lang == "tr" else "Qualitative Reporting", f"{api_info['provider']} ({api_info['model']}) üzerinden detaylı analiz başlıyor..." if lang == "tr" else f"Detailed analysis starting via {api_info['provider']} ({api_info['model']})...")
                     llm_analysis_results = analyze_comments_with_llm(
-                        yorumlar, api_info["provider"], api_info["api_key"], api_info["model"], progress_cb
+                        yorumlar, api_info["provider"], api_info["api_key"], api_info["model"], progress_cb, lang=lang
                     )
                     model_info = f"{api_info['provider'].upper()} API ({api_info['model']})"
-
-                # LLM sonuçlarına göre istatistikleri derle
+ 
+                # LLM sonuçlarına göre istatistikleri derle (Hem TR hem EN kategorileri destekler)
                 total = len(yorumlar)
-                kaygi_sayisi = sum(1 for r in llm_analysis_results if r.get("category") in ["Mesleki Gelecek Kaygisi", "Felsefi/Varolussal Sorgulama", "Etik ve Telif Hassasiyeti"])
-                mentor_sayisi = sum(1 for r in llm_analysis_results if r.get("role") == "Akran Mentoru")
-                cosku_sayisi = sum(1 for r in llm_analysis_results if r.get("category") in ["Heyecan ve Kesif Motivasyonu", "Yaratici Is Akisi Tartismasi"])
-                hata_sayisi = sum(1 for r in llm_analysis_results if r.get("category") in ["Teknik Sorun ve Destek Arayisi", "Maliyet ve Erisilebilirlik Sorunu"])
-                etik_sayisi = sum(1 for r in llm_analysis_results if r.get("category") in ["Etik ve Telif Hassasiyeti", "Felsefi/Varolussal Sorgulama"])
-                destek_sayisi = sum(1 for r in llm_analysis_results if r.get("category") == "Sosyal Destek ve Tesekkur")
+                kaygi_kats = ["Mesleki Gelecek Kaygisi", "Felsefi/Varolussal Sorgulama", "Etik ve Telif Hassasiyeti",
+                              "Professional Future Anxiety", "Philosophical/Existential Inquiries", "Ethic and Copyright Sensitivity"]
+                cosku_kats = ["Heyecan ve Kesif Motivasyonu", "Yaratici Is Akisi Tartismasi",
+                              "Excitement and Discovery Motivation", "Creative Workflow Discussion"]
+                hata_kats = ["Teknik Sorun ve Destek Arayisi", "Maliyet ve Erisilebilirlik Sorunu",
+                             "Technical Issue and Support Seeking", "Cost and Accessibility Issue"]
+                etik_kats = ["Etik ve Telif Hassasiyeti", "Felsefi/Varolussal Sorgulama",
+                             "Ethic and Copyright Sensitivity", "Philosophical/Existential Inquiries"]
+                destek_kats = ["Sosyal Destek ve Tesekkur", "Social Support and Gratitude"]
 
+                kaygi_sayisi = sum(1 for r in llm_analysis_results if r.get("category") in kaygi_kats)
+                mentor_sayisi = sum(1 for r in llm_analysis_results if r.get("role") in ["Akran Mentoru", "Peer Mentor"])
+                cosku_sayisi = sum(1 for r in llm_analysis_results if r.get("category") in cosku_kats)
+                hata_sayisi = sum(1 for r in llm_analysis_results if r.get("category") in hata_kats)
+                etik_sayisi = sum(1 for r in llm_analysis_results if r.get("category") in etik_kats)
+                destek_sayisi = sum(1 for r in llm_analysis_results if r.get("category") in destek_kats)
+ 
                 stats = {
                     "total": total,
                     "kaygi": (kaygi_sayisi / total) * 100 if total > 0 else 0,
@@ -134,14 +144,14 @@ class IklimAynasiAgent:
                 
                 saglik_skoru = ((mentor_sayisi + destek_sayisi) / total) * 100 if total > 0 else 0
                 if saglik_skoru >= 30:
-                    stats["indeks"] = "🟢 Yüksek Sosyal Sermaye (A Sınıfı)"
+                    stats["indeks"] = "🟢 Yüksek Sosyal Sermaye (A Sınıfı)" if lang == "tr" else "🟢 High Social Capital (Class A)"
                 elif saglik_skoru >= 15:
-                    stats["indeks"] = "🟡 Orta Sosyal Sermaye (B Sınıfı)"
+                    stats["indeks"] = "🟡 Orta Sosyal Sermaye (B Sınıfı)" if lang == "tr" else "🟡 Medium Social Capital (Class B)"
                 else:
-                    stats["indeks"] = "🔴 Düşük Sosyal Sermaye (C Sınıfı)"
+                    stats["indeks"] = "🔴 Düşük Sosyal Sermaye (C Sınıfı)" if lang == "tr" else "🔴 Low Social Capital (Class C)"
                 
                 # 2. Sentez Raporunu Oluştur
-                self.log_action("Sentez Raporlama", "Analiz sonuçları birleştirilip rapor yazılıyor...")
+                self.log_action("Sentez Raporlama" if lang == "tr" else "Synthesis Reporting", "Analiz sonuçları birleştirilip rapor yazılıyor..." if lang == "tr" else "Synthesizing results and writing report...")
                 
                 # Rapor üretirken mutabakat modunda birincil modeli kullanalım
                 if api_info.get("consensus_mode"):
@@ -154,31 +164,31 @@ class IklimAynasiAgent:
                     report_key = api_info["api_key"]
                 
                 akademik_rapor = get_llm_report(
-                    meta, stats, yorumlar, report_provider, report_key, primary_model, llm_analysis_results
+                    meta, stats, yorumlar, report_provider, report_key, primary_model, llm_analysis_results, lang=lang
                 )
                 if not akademik_rapor:
-                    raise Exception("Model boş rapor döndürdü.")
+                    raise Exception("Model boş rapor döndürdü." if lang == "tr" else "Model returned an empty report.")
                 
                 # LLM analizini geriye dönük arayüzle uyumlu hale getirmek için duygu/rol dict'lerini güncelle
                 duygu_sonuclari = {}
                 rol_sonuclari = {}
                 for r in llm_analysis_results:
-                    cat = r.get("category", "Genel Gozlem")
+                    cat = r.get("category", "Genel Gozlem" if lang == "tr" else "General Observation")
                     duygu_sonuclari[cat] = duygu_sonuclari.get(cat, 0) + 1
-                    rol = r.get("role", "Pasif Destekci")
+                    rol = r.get("role", "Pasif Destekci" if lang == "tr" else "Passive Supporter")
                     rol_sonuclari[rol] = rol_sonuclari.get(rol, 0) + 1
                     
             except Exception as e:
-                self.log_action("LLM Analiz/Raporlama Hatası", str(e))
+                self.log_action("LLM Analiz/Raporlama Hatası" if lang == "tr" else "LLM Analysis/Reporting Error", str(e))
                 raise e
         else:
             # Fallback: Kural Tabanlı Rapor Oluşturucu (Çevrimdışı Mod)
-            self.log_action("Araç Tetikleme", "izleyici_raporu_olusturucu() çağrılıyor (Çevrimdışı Mod)...")
+            self.log_action("Araç Tetikleme" if lang == "tr" else "Tool Triggering", "izleyici_raporu_olusturucu() çağrılıyor (Çevrimdışı Mod)..." if lang == "tr" else "Calling izleyici_raporu_olusturucu() (Offline Mode)...")
             akademik_rapor = izleyici_raporu_olusturucu(duygu_sonuclari, rol_sonuclari, topluluk_turu)
-            model_info = "Kural Tabanlı Analiz (Çevrimdışı Fallback)"
+            model_info = "Kural Tabanlı Analiz (Çevrimdışı Fallback)" if lang == "tr" else "Rule-Based Analysis (Offline Fallback)"
             consensus_stats = None
             
-        self.log_action("Analiz Tamamlandı", "Tüm analizler ve rapor başarıyla birleştirildi.")
+        self.log_action("Analiz Tamamlandı" if lang == "tr" else "Analysis Completed", "Tüm analizler ve rapor başarıyla birleştirildi." if lang == "tr" else "All analyses and report successfully merged.")
         
         return {
             "topluluk_turu": topluluk_turu,
