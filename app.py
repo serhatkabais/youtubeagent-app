@@ -44,6 +44,12 @@ def parse_selected_model(option):
         return option[6:]
     return option
 
+def get_model_index(model_list, target_model_name):
+    for idx, name in enumerate(model_list):
+        if target_model_name.lower() in name.lower():
+            return idx
+    return 0
+
 # Sayfa Yapılandırması ve Akademik Tema
 st.set_page_config(
     page_title="İzleyici İklimi Aynası",
@@ -278,9 +284,9 @@ gemini_fallback = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "
 groq_fallback = ["llama-3.3-70b-versatile", "llama-3.1-70b-versatile", "mixtral-8x7b-32768", "llama-3.1-8b-instant"]
 or_fallback = [
     "meta-llama/llama-3.3-70b-instruct:free", 
-    "qwen/qwen3-coder:free", 
-    "google/gemma-4-31b-it:free", 
-    "google/gemma-4-26b-a4b-it:free", 
+    "deepseek/deepseek-chat",
+    "qwen/qwen-2.5-72b-instruct:free", 
+    "google/gemma-2-9b-it:free", 
     "meta-llama/llama-3.2-3b-instruct:free"
 ]
 
@@ -323,9 +329,10 @@ st.sidebar.markdown("### 🛠️ Mutabakat Modellerini Seç")
 
 # Model 1
 st.sidebar.markdown("**1. Model Yapılandırması**")
-m1_prov = st.sidebar.selectbox("Sağlayıcı 1:", ["Gemini API", "Groq API", "OpenRouter"], key="m1_prov")
+m1_prov = st.sidebar.selectbox("Sağlayıcı 1:", ["OpenRouter", "Gemini API", "Groq API"], key="m1_prov")
 m1_models_list, m1_key, m1_code = MODELS_MAP[m1_prov]
-m1_choice = st.sidebar.selectbox("Model 1:", m1_models_list + ["Özel Model Gir (Custom)..."], key="m1_choice")
+m1_default_idx = get_model_index(m1_models_list, "llama-3.3-70b")
+m1_choice = st.sidebar.selectbox("Model 1:", m1_models_list + ["Özel Model Gir (Custom)..."], index=m1_default_idx, key="m1_choice")
 m1_val = ""
 if m1_choice == "Özel Model Gir (Custom)...":
     m1_val = st.sidebar.text_input("Özel Model 1 Kodu:", key="m1_custom").strip()
@@ -335,9 +342,14 @@ models_config_list.append({"provider": m1_code, "api_key": m1_key, "model": m1_v
 
 # Model 2
 st.sidebar.markdown("**2. Model Yapılandırması**")
-m2_prov = st.sidebar.selectbox("Sağlayıcı 2:", ["Gemini API", "Groq API", "OpenRouter"], key="m2_prov")
+m2_prov = st.sidebar.selectbox("Sağlayıcı 2:", ["OpenRouter", "Gemini API", "Groq API"], key="m2_prov")
 m2_models_list, m2_key, m2_code = MODELS_MAP[m2_prov]
-m2_choice = st.sidebar.selectbox("Model 2:", m2_models_list + ["Özel Model Gir (Custom)..."], key="m2_choice")
+m2_default_idx = get_model_index(m2_models_list, "deepseek-chat")
+if m2_default_idx == 0:
+    m2_default_idx = get_model_index(m2_models_list, "qwen")
+if m2_default_idx == 0 and len(m2_models_list) > 1:
+    m2_default_idx = 1
+m2_choice = st.sidebar.selectbox("Model 2:", m2_models_list + ["Özel Model Gir (Custom)..."], index=m2_default_idx, key="m2_choice")
 m2_val = ""
 if m2_choice == "Özel Model Gir (Custom)...":
     m2_val = st.sidebar.text_input("Özel Model 2 Kodu:", key="m2_custom").strip()
@@ -347,9 +359,14 @@ models_config_list.append({"provider": m2_code, "api_key": m2_key, "model": m2_v
 
 # Model 3
 st.sidebar.markdown("**3. Model Yapılandırması**")
-m3_prov = st.sidebar.selectbox("Sağlayıcı 3:", ["Gemini API", "Groq API", "OpenRouter"], key="m3_prov")
+m3_prov = st.sidebar.selectbox("Sağlayıcı 3:", ["OpenRouter", "Gemini API", "Groq API"], key="m3_prov")
 m3_models_list, m3_key, m3_code = MODELS_MAP[m3_prov]
-m3_choice = st.sidebar.selectbox("Model 3:", m3_models_list + ["Özel Model Gir (Custom)..."], key="m3_choice")
+m3_default_idx = get_model_index(m3_models_list, "gemma")
+if m3_default_idx == 0:
+    m3_default_idx = get_model_index(m3_models_list, "llama-3.2")
+if m3_default_idx == 0 and len(m3_models_list) > 2:
+    m3_default_idx = 2
+m3_choice = st.sidebar.selectbox("Model 3:", m3_models_list + ["Özel Model Gir (Custom)..."], index=m3_default_idx, key="m3_choice")
 m3_val = ""
 if m3_choice == "Özel Model Gir (Custom)...":
     m3_val = st.sidebar.text_input("Özel Model 3 Kodu:", key="m3_custom").strip()
