@@ -1,0 +1,22 @@
+name: Keep Streamlit App Alive
+
+on:
+  schedule:
+    # Günde bir kez saat 08:00 UTC (Türkiye saatiyle 11:00) çalışır
+    - cron: '0 8 * * *'
+  workflow_dispatch: # GitHub Actions sekmesinden elle de tetiklenebilir
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Streamlit Community Cloud
+        run: |
+          echo "Streamlit uygulamasının uyku moduna geçmesini önlemek için istek gönderiliyor..."
+          STATUS=$(curl -sL -w "%{http_code}" "https://youtubeagent-app-n25vmkfx64azg9zzmdxmyr.streamlit.app/" -o /dev/null)
+          echo "HTTP Yanıt Kodu: $STATUS"
+          if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 400 ]; then
+            echo "Başarılı: Uygulama uyanık tutuldu! ✅"
+          else
+            echo "Uyarı: HTTP $STATUS kodu alındı. Yeniden denenebilir."
+          fi

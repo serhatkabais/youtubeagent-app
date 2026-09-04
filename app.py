@@ -11,6 +11,17 @@ load_dotenv()
 from agent import IklimAynasiAgent
 from get_youtube_comments import download_live_comments, video_kunyesi_uret
 from tools import duygu_ve_kaygi_analizi, dijital_rol_dedektoru, topluluk_turu_tespit_et, tekil_yorum_izleyici_onerisi
+from database_manager import (
+    init_database,
+    save_analysis,
+    get_all_analyses,
+    get_analysis,
+    delete_analysis,
+    get_meta_analysis_dataframe,
+    export_combined_corpus
+)
+
+db_status = init_database()
 
 # Sayfa Yapılandırması (Streamlit gereği ilk çağrı olmalı)
 st.set_page_config(
@@ -128,7 +139,38 @@ UI_TXT = {
         "logs_title": "### 🪵 Ajan İşlem Günlüğü (Özdüşünümsellik / Bellek Kayıtları)",
         "logs_desc": "Dijital etnografik saha günlüğü; ajanın aldığı analitik ve metodolojik kararların özdüşünümsel (reflexive) kayıt defteridir.",
         "original_lang": "Orijinal Dil",
-        "translation": "Çeviri"
+        "translation": "Çeviri",
+        "silent_majority_title": "👻 Sessiz Çoğunluk & Görünmez İzleyici Analizi (Lurkers & 90-9-1 Kuralı)",
+        "silent_majority_desc": "Jakob Nielsen'in (2006) Katılım Eşitsizliği ve Nonnecke & Preece'in (2000) Çevrimiçi Sessiz Kitle (Lurker) Etnografisi kuramları uyarınca izlenme, beğeni ve yorum oranlarının modellenmesi.",
+        "cvr_label": "Yorum/İzlenme Oranı (CVR)",
+        "lvr_label": "Beğeni/İzlenme Oranı (LVR)",
+        "lurker_ratio_label": "Sessiz İzleyici (Lurker) Oranı",
+        "vitality_typology_label": "Topluluk Canlılık Tipolojisi",
+        "nielsen_distribution": "Nielsen 90-9-1 Katılım Eşitsizliği Modeli",
+        "or_pool_title": "OpenRouter Model Havuzu Filtresi:",
+        "or_pool_all": "Tümü (Önce Ücretsizler, Sonra En Ucuzdan Pahalıya)",
+        "or_pool_free": "Yalnızca Ücretsiz Modeller ([FREE])",
+        "or_pool_paid": "Yalnızca Ücretli Modeller (En Ucuzdan Başlayarak)",
+        "tab_meta": "📚 Meta-Analiz & Saha Arşivi",
+        "meta_title": "📚 Çok-Sahalı Karşılaştırmalı Etnografi ve Saha Arşivi",
+        "meta_desc": "Farklı dijital sahalarda (YouTube video topluluklarında) yürütülen etnografik araştırmaların saklandığı, karşılaştırmalı meta-analizlerin yapıldığı ve geçmiş çalışmaların tek tıkla oturuma geri yüklenebildiği araştırma havuzu.",
+        "meta_stat_total": "İncelenen Saha (Video)",
+        "meta_stat_comments": "Analiz Edilen Yorum",
+        "meta_stat_avg_cvr": "Ort. CVR (Katılım)",
+        "meta_stat_avg_lurker": "Ort. Sessiz Kitle (Lurker)",
+        "meta_community_dist": "Topluluk Türü Dağılımı",
+        "meta_lurker_comparison": "Sahalar Arası Katılım ve Sessiz Kitle (Lurker) Karşılaştırması",
+        "meta_consensus_comparison": "Sahalar Arası Çoklu LLM Mutabakat Güvenilirliği (Fleiss' Kappa)",
+        "meta_saved_fields": "📁 Kayıtlı Etnografik Sahalar",
+        "meta_btn_load": "📥 Sahayı Oturuma Yükle",
+        "meta_btn_delete": "🗑️ Sahayı Arşivden Sil",
+        "meta_btn_export_all": "📦 Tüm Sahaları Birleşik Excel (.xlsx) Olarak İndir (Meta + Tüm Yorumlar)",
+        "meta_empty_state": "Henüz kayıtlı bir saha bulunmuyor. 'Etnografik Saha Analizi' sekmesinden bir videoyu analiz ettiğinizde otomatik olarak buraya arşivlenecektir.",
+        "meta_field_loaded": "✅ '{title}' başlıklı saha çalışması başarıyla aktif oturuma yüklendi!",
+        "meta_field_deleted": "🗑️ Saha çalışması arşivden silindi.",
+        "firebase_card_title": "🔥 Kalıcı Bulut Veri Tabanı (Firebase Firestore)",
+        "firebase_connected_msg": "Firebase Firestore bağlantısı aktif. Tüm saha çalışmaları bulutta kalıcı olarak saklanmaktadır.",
+        "firebase_local_msg": "Şu anda Yerel JSON Arşiv modu devrede (`data/fieldwork_archive.json`). Firebase Firestore'a bağlanmak için `firebase_credentials.json` dosyasını proje kök dizinine ekleyebilirsiniz."
     },
     "en": {
         "page_title": "Audience Climate Mirror",
@@ -244,7 +286,27 @@ UI_TXT = {
         "or_pool_title": "OpenRouter Model Pool Filter:",
         "or_pool_all": "All (Free First, Then Cheapest to Most Expensive)",
         "or_pool_free": "Free Models Only ([FREE])",
-        "or_pool_paid": "Paid Models Only (Price Sorted - Cheapest First)"
+        "or_pool_paid": "Paid Models Only (Price Sorted - Cheapest First)",
+        "tab_meta": "📚 Meta-Analysis & Field Archive",
+        "meta_title": "📚 Cross-Field Comparative Ethnography & Field Archive",
+        "meta_desc": "Research repository where digital ethnographic studies conducted across various YouTube communities are archived, cross-field comparative meta-analyses are visualized, and past fieldwork can be loaded back into active sessions.",
+        "meta_stat_total": "Examined Fields (Videos)",
+        "meta_stat_comments": "Analyzed Comments",
+        "meta_stat_avg_cvr": "Mean CVR (Participation)",
+        "meta_stat_avg_lurker": "Mean Silent Audience (Lurker)",
+        "meta_community_dist": "Community Type Distribution",
+        "meta_lurker_comparison": "Cross-Field Engagement & Silent Majority (Lurker) Comparison",
+        "meta_consensus_comparison": "Cross-Field Multi-LLM Inter-Coder Reliability (Fleiss' Kappa)",
+        "meta_saved_fields": "📁 Archived Ethnographic Fields",
+        "meta_btn_load": "📥 Load Field Into Session",
+        "meta_btn_delete": "🗑️ Delete From Archive",
+        "meta_btn_export_all": "📦 Download Combined Corpus Excel (.xlsx) (Meta + All Coded Comments)",
+        "meta_empty_state": "No archived fields found yet. When you run an analysis in the 'Ethnographic Fieldwork' tab, it will be automatically archived here.",
+        "meta_field_loaded": "✅ Fieldwork '{title}' successfully loaded into active session!",
+        "meta_field_deleted": "🗑️ Fieldwork deleted from archive.",
+        "firebase_card_title": "🔥 Persistent Cloud Database (Firebase Firestore)",
+        "firebase_connected_msg": "Firebase Firestore is active. All fieldwork data is permanently stored in the cloud.",
+        "firebase_local_msg": "Currently operating in Local JSON Archive mode (`data/fieldwork_archive.json`). To connect to Firebase Firestore, place `firebase_credentials.json` in the project root."
     }
 }
 
@@ -568,6 +630,11 @@ if gemini_key and not gemini_key.startswith("your_") and len(gemini_key.strip())
 else:
     st.sidebar.markdown(f"- **Gemini API:** 🔴 `{UI_TXT[lang]['not_configured']}`")
 
+if db_status.get("firestore_connected"):
+    st.sidebar.markdown(f"- **Veri Tabanı:** 🟢 `Firebase Firestore`" if lang == "tr" else f"- **Database:** 🟢 `Firebase Firestore`")
+else:
+    st.sidebar.markdown(f"- **Veri Tabanı:** 🟠 `Yerel JSON Arşivi`" if lang == "tr" else f"- **Database:** 🟠 `Local JSON Archive`")
+
 MODELS_MAP = {
     "Groq API": (groq_formatted, groq_key, "groq"),
     "OpenRouter": (or_formatted, or_key, "openrouter"),
@@ -674,10 +741,11 @@ st.markdown(f"<div class='main-title'>{UI_TXT[lang]['main_title']}</div>", unsaf
 st.markdown(f"<div class='sub-title'>{UI_TXT[lang]['main_subtitle']}</div>", unsafe_allow_html=True)
 
 # Sekmelerin Oluşturulması
-tab_intro, tab_analiz, tab_sahanotu, tab_loglar = st.tabs([
+tab_intro, tab_analiz, tab_sahanotu, tab_meta, tab_loglar = st.tabs([
     UI_TXT[lang]["tab_home"], 
     UI_TXT[lang]["tab_analysis"], 
     UI_TXT[lang]["tab_fieldnotes"],
+    UI_TXT[lang]["tab_meta"],
     UI_TXT[lang]["tab_logs"]
 ])
 
@@ -881,6 +949,20 @@ with tab_analiz:
                         progress_bar.empty()
                         st.session_state.analysis_result = analysis
                         st.success(UI_TXT[lang]["success_analysis"].format(count=len(selected_comments)))
+                        
+                        # Otomatik Veritabanı / Arşiv Kaydı (Firebase Firestore & Yerel JSON)
+                        try:
+                            save_res = save_analysis(
+                                st.session_state.video_id,
+                                st.session_state.video_metadata,
+                                analysis,
+                                selected_comments
+                            )
+                            if save_res.get("success"):
+                                storage_label = "Firebase Firestore" if save_res.get("storage") == "firestore" else ("Yerel JSON Arşivi" if lang == "tr" else "Local JSON Archive")
+                                st.toast(f"💾 Saha çalışması {storage_label} sistemine arşivlendi!" if lang == "tr" else f"💾 Fieldwork archived to {storage_label}!", icon="📚")
+                        except Exception as s_err:
+                            pass
                     except Exception as err:
                         st.error("❌ Yapay Zekâ Analiz Hatası:" if lang == "tr" else "❌ AI Analysis Error:")
                         st.code(str(err), language="text")
@@ -1261,7 +1343,175 @@ with tab_sahanotu:
             use_container_width=True
         )
 
-# ----------------- TAB 4: BELLEK VE LOG KAYITLARI -----------------
+# ----------------- TAB 4: META-ANALİZ & SAHA ARŞİVİ -----------------
+with tab_meta:
+    st.markdown(f"<h2 class='agent-header'>{UI_TXT[lang]['meta_title']}</h2>", unsafe_allow_html=True)
+    st.caption(UI_TXT[lang]["meta_desc"])
+    
+    # Verileri Çek
+    all_saved = get_all_analyses()
+    meta_df = get_meta_analysis_dataframe()
+    
+    if meta_df.empty:
+        st.info(f"ℹ️ {UI_TXT[lang]['meta_empty_state']}")
+    else:
+        # 1. Üst Metrik Kartları
+        m_c1, m_c2, m_c3, m_c4 = st.columns(4)
+        m_c1.metric(UI_TXT[lang]["meta_stat_total"], len(meta_df))
+        total_comments_num = int(meta_df['orneklem_sayisi'].sum()) if 'orneklem_sayisi' in meta_df.columns else 0
+        m_c2.metric(UI_TXT[lang]["meta_stat_comments"], f"{total_comments_num:,}")
+        avg_cvr = meta_df['cvr'].mean() if 'cvr' in meta_df.columns else 0.0
+        avg_lurker = meta_df['lurker_orani'].mean() if 'lurker_orani' in meta_df.columns else 0.0
+        m_c3.metric(UI_TXT[lang]["meta_stat_avg_cvr"], f"%{avg_cvr:.3f}")
+        m_c4.metric(UI_TXT[lang]["meta_stat_avg_lurker"], f"%{avg_lurker:.1f}")
+        
+        st.write("")
+        
+        # 2. Sahalar Arası Karşılaştırmalı Görselleştirmeler
+        col_g1, col_g2 = st.columns(2)
+        
+        with col_g1:
+            st.markdown(f"#### 🌐 {UI_TXT[lang]['meta_community_dist']}")
+            topluluk_sayilari = meta_df['topluluk_turu'].value_counts().reset_index()
+            topluluk_sayilari.columns = ['Topluluk Türü', 'Saha Sayısı']
+            fig_topluluk = px.pie(
+                topluluk_sayilari, 
+                names='Topluluk Türü', 
+                values='Saha Sayısı',
+                hole=0.4,
+                color_discrete_sequence=px.colors.sequential.RdBu
+            )
+            fig_topluluk.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+            st.plotly_chart(fig_topluluk, use_container_width=True)
+            
+        with col_g2:
+            st.markdown(f"#### 👻 {UI_TXT[lang]['meta_lurker_comparison']}")
+            plot_df = meta_df.copy()
+            plot_df['kisa_baslik'] = plot_df['baslik'].apply(lambda x: (str(x)[:28] + '...') if len(str(x)) > 30 else str(x))
+            fig_lurker = px.bar(
+                plot_df,
+                x='kisa_baslik',
+                y=['cvr', 'lurker_orani'],
+                barmode='group',
+                labels={'kisa_baslik': 'Saha (Video)', 'value': 'Oran (%)', 'variable': 'Metrik'},
+                color_discrete_map={'cvr': '#8B0000', 'lurker_orani': '#4A5568'}
+            )
+            fig_lurker.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+            st.plotly_chart(fig_lurker, use_container_width=True)
+            
+        # Fleiss' Kappa Karşılaştırması
+        if 'kappa_sentiment' in meta_df.columns:
+            st.markdown(f"#### 🎓 {UI_TXT[lang]['meta_consensus_comparison']}")
+            fig_kappa = px.bar(
+                plot_df,
+                x='kisa_baslik',
+                y=['kappa_sentiment', 'kappa_category', 'kappa_role'],
+                barmode='group',
+                labels={'kisa_baslik': 'Saha (Video)', 'value': "Fleiss' Kappa (κ)", 'variable': 'Kodlama Alanı'},
+                color_discrete_sequence=['#1A365D', '#2B6CB0', '#4299E1']
+            )
+            fig_kappa.add_hline(y=0.61, line_dash="dash", line_color="green", annotation_text="Önemli Düzeyde Uyum (κ >= 0.61)")
+            fig_kappa.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+            st.plotly_chart(fig_kappa, use_container_width=True)
+            
+        st.divider()
+        
+        # 3. Arşiv Tablosu ve Oturuma Yükleme
+        st.markdown(f"### {UI_TXT[lang]['meta_saved_fields']}")
+        
+        display_df = meta_df[['video_id', 'baslik', 'kanal', 'topluluk_turu', 'orneklem_sayisi', 'cvr', 'lurker_orani', 'tarih']].copy()
+        display_df.columns = [
+            'Video ID', 
+            'Video Başlığı' if lang == 'tr' else 'Title',
+            'Kanal' if lang == 'tr' else 'Channel',
+            'Topluluk Türü' if lang == 'tr' else 'Community Type',
+            'Yorum Sayısı' if lang == 'tr' else 'Sample N',
+            'CVR (%)',
+            'Lurker (%)',
+            'Analiz Tarihi' if lang == 'tr' else 'Date'
+        ]
+        st.dataframe(display_df, use_container_width=True)
+        
+        # Saha Seçici & Aksiyonlar
+        col_act1, col_act2, col_act3 = st.columns([2, 1, 1])
+        selected_vid = col_act1.selectbox(
+            "İncelemek veya Oturuma Yüklemek İçin Saha Seçin:" if lang == "tr" else "Select Field to Inspect or Load:",
+            options=[s.get("video_id") for s in all_saved],
+            format_func=lambda vid: f"{vid} - {next((s.get('title', vid) for s in all_saved if s.get('video_id') == vid), vid)[:50]}",
+            key="meta_field_select_box"
+        )
+        
+        if col_act2.button(UI_TXT[lang]["meta_btn_load"], use_container_width=True, key="btn_load_meta_field"):
+            loaded_field = get_analysis(selected_vid)
+            if loaded_field:
+                st.session_state.video_id = loaded_field.get("video_id", DEFAULT_VIDEO_ID)
+                st.session_state.video_metadata = {
+                    "title": loaded_field.get("title", "Arşiv Saha"),
+                    "uploader": loaded_field.get("uploader", "Arşiv Kanal"),
+                    "views": str(loaded_field.get("views", "0")),
+                    "likes": str(loaded_field.get("likes", "0")),
+                    "comment_count": str(loaded_field.get("comment_count", "0")),
+                    "upload_date": loaded_field.get("upload_date", ""),
+                    "thumbnail": loaded_field.get("thumbnail", f"https://img.youtube.com/vi/{st.session_state.video_id}/maxresdefault.jpg"),
+                    "url": loaded_field.get("url", f"https://www.youtube.com/watch?v={st.session_state.video_id}")
+                }
+                st.session_state.analysis_result = {
+                    "topluluk_turu": loaded_field.get("topluluk_turu", "genel"),
+                    "topluluk_turu_str": loaded_field.get("topluluk_turu_str", "Genel Topluluk"),
+                    "model_info": loaded_field.get("model_info", "Kural Tabanlı"),
+                    "duygu": loaded_field.get("duygu", {}),
+                    "rol": loaded_field.get("rol", {}),
+                    "consensus_stats": loaded_field.get("consensus_stats", {}),
+                    "sessiz_cogunluk": loaded_field.get("sessiz_cogunluk", {}),
+                    "rapor": loaded_field.get("rapor", ""),
+                    "llm_results": loaded_field.get("llm_results", [])
+                }
+                st.session_state.comments_data = loaded_field.get("comments", [])
+                st.session_state.comment_index = 0
+                st.session_state.is_sample_mode = False
+                st.success(UI_TXT[lang]["meta_field_loaded"].format(title=st.session_state.video_metadata.get('title', selected_vid)))
+                st.rerun()
+                
+        if col_act3.button(UI_TXT[lang]["meta_btn_delete"], use_container_width=True, key="btn_del_meta_field"):
+            if delete_analysis(selected_vid):
+                st.warning(UI_TXT[lang]["meta_field_deleted"])
+                st.rerun()
+                
+        st.write("")
+        # 4. Birleşik Külliyat / Korpus Dışa Aktarımı (.xlsx)
+        combined_xlsx = export_combined_corpus()
+        st.download_button(
+            label=UI_TXT[lang]["meta_btn_export_all"],
+            data=combined_xlsx,
+            file_name="kolektif_dijital_etnografi_korpusu.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            use_container_width=True,
+            key="btn_download_corpus_xlsx"
+        )
+
+    # Firebase Bilgilendirme ve Kurulum Kartı
+    with st.expander(UI_TXT[lang]["firebase_card_title"], expanded=False):
+        if db_status.get("firestore_connected"):
+            st.success(f"🟢 {UI_TXT[lang]['firebase_connected_msg']}")
+        else:
+            st.warning(f"🟠 {UI_TXT[lang]['firebase_local_msg']}")
+            st.markdown("""
+            **Firebase Firestore 3 Adımda Nasıl Bağlanır?**
+            1. [Firebase Console](https://console.firebase.google.com/) -> Proje Oluşturun -> **Firestore Database** etkinleştirin (Test/Production mod).
+            2. **Project Settings** -> **Service Accounts** sekmesine gidin -> **Generate new private key** butonuna basarak JSON dosyasını indirin.
+            3. Bu dosyayı proje kök dizinine `firebase_credentials.json` adıyla yapıştırın (veya Streamlit Secrets'a `FIREBASE_CREDENTIALS` olarak içeriğini yapıştırın).
+            
+            *Sistem dosyayı otomatik algılar ve yerel arşivdeki verileri Firestore'a senkronize eder.*
+            """ if lang == "tr" else """
+            **How to Connect Firebase Firestore in 3 Steps:**
+            1. Go to [Firebase Console](https://console.firebase.google.com/) -> Create Project -> Enable **Firestore Database**.
+            2. Navigate to **Project Settings** -> **Service Accounts** -> Click **Generate new private key** and download the JSON.
+            3. Save this file as `firebase_credentials.json` in the root folder (or add its contents to Streamlit Secrets as `FIREBASE_CREDENTIALS`).
+            
+            *The platform automatically detects the file and syncs data to Firestore.*
+            """)
+
+# ----------------- TAB 5: BELLEK VE LOG KAYITLARI -----------------
 with tab_loglar:
     st.markdown(UI_TXT[lang]["logs_title"])
     st.caption(UI_TXT[lang]["logs_desc"])
