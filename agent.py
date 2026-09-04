@@ -1,21 +1,29 @@
 import os
-from tools import duygu_ve_kaygi_analizi, dijital_rol_dedektoru, izleyici_raporu_olusturucu, topluluk_turu_tespit_et
+from tools import (
+    duygu_ve_kaygi_analizi, 
+    dijital_rol_dedektoru, 
+    izleyici_raporu_olusturucu, 
+    topluluk_turu_tespit_et, 
+    analiz_et_sessiz_cogunluk,
+    COMMUNITY_LEXICONS
+)
 
 class IklimAynasiAgent:
     def __init__(self):
-        # Yönerge 3. Madde: Rol / Sistem Talimatı Zorunluluğu
-        self.role = "Çevrimiçi İzleyici Toplulukları İklim ve Jargon Çözümleyici Karar Destek Ajanı"
+        # Dijital Etnografi & Siber-Antropoloji Ajanı Kimliği
+        self.role = "Dijital Etnografi ve Siber-Kültür Araştırma Ajanı (Audience Netnography Copilot)"
         self.system_instructions = (
-            "Sen, çevrimiçi/gayriresmi eğitim videolarının altındaki yorumlarda izleyicilerin kullandığı "
-            "örtük dili, jargonları, gelecek kaygılarını, heyecanlarını ve topluluk içi rollerini inceleyerek "
-            "eğitim tasarımcılarına ve içerik üreticilerine izleyici iklimini raporlayan bir karar destek ajanısın."
+            "Sen, çevrimiçi video platformlarındaki (YouTube vb.) asenkron dijital toplulukların dilini, "
+            "siber-jargonlarını, kolektif duygulanım iklimlerini (Sara Ahmed), teknolojik kaygılarını ve "
+            "Kozinets'in netnografik rollerini (İçeridekiler, Tutkulular, Sosyalleşenler, Turistler) çözümleyen "
+            "bir Dijital Etnografi ve Siber-Antropoloji Araştırma Ajanısın."
         )
-        # Yönerge 3. Madde: Bellek / Kayıt Zorunluluğu (İşlem Günlüğü Logları)
+        # Etnografik Saha Günlüğü ve Özdüşünümsellik Kayıtları (Reflexivity Log)
         self.logs = []
-        self.log_action("Başlatma", "Ajan başarıyla başlatıldı. İzleyici İklimi Aynası konsepti yüklendi.")
+        self.log_action("Saha Başlatıldı", "Ajan başarıyla başlatıldı. Dijital Etnografi ve Netnografi konsepti yüklendi.")
 
     def log_action(self, islem, detay):
-        """Ajanın yaptığı tüm kararları ve işlem geçmişini loglar."""
+        """Ajanın aldığı etnografik kararları ve işlem günlüğünü loglar."""
         self.logs.append({
             "islem": islem,
             "detay": detay
@@ -23,24 +31,36 @@ class IklimAynasiAgent:
 
     def video_analiz_et(self, yorumlar, meta=None, api_info=None, lang="tr"):
         """
-        [KARAR AKIŞI] Tek bir video için yorumları analiz eder, 
-        uygun araçları tetikler ve sonuçları birleştirir.
-        Gelişmiş LLM API'si (Gemini/Groq/OpenRouter) mevcutsa nitel 
-        pedagojik raporu LLM ile yazar, yoksa kural tabanlı template kullanır.
+        [ETNOGRAFİK SAHA ANALİZİ AKIŞI] Belirtilen dijital saha (video yorum havuzu) için
+        nitel ve hesaplamalı çözümleme yapar, Kozinets rollerini ve kolektif duygulanımı haritalar.
         """
-        self.log_action("Analiz Başladı" if lang == "tr" else "Analysis Started", f"Yorumların analizi tetiklendi. Yorum sayısı: {len(yorumlar)}" if lang == "tr" else f"Comment analysis triggered. Number of comments: {len(yorumlar)}")
+        self.log_action("Saha Çalışması Başladı" if lang == "tr" else "Fieldwork Started", f"Yorum havuzu analiz ediliyor. Gözlem sayısı: {len(yorumlar)}" if lang == "tr" else f"Analyzing comment pool. Observations count: {len(yorumlar)}")
         
         # Karar Akışı: Veri boşsa doğrudan durdur
         if not yorumlar:
             self.log_action("Hata" if lang == "tr" else "Error", "Gelen veri kümesi boş." if lang == "tr" else "Incoming dataset is empty.")
             return None
             
-        # Topluluk Türünün Otomatik Tespiti
-        self.log_action("Topluluk Türü Tespiti" if lang == "tr" else "Community Type Detection", "Yorum kelimelerine göre topluluk türü analiz ediliyor..." if lang == "tr" else "Analyzing community type based on comment words...")
+        # Künye ve API Bilgilerini kontrol et / doldur
+        if not meta:
+            meta = {"title": "Bilinmeyen Video" if lang == "tr" else "Unknown Video", "uploader": "Bilinmeyen Kanal" if lang == "tr" else "Unknown Channel", "views": "Bilinmiyor" if lang == "tr" else "Unknown"}
+
+        # Araç 4'ün Tetiklenmesi: Sessiz Çoğunluk & Katılım Eşitsizliği (90-9-1) Analizi
+        self.log_action("Sessiz Çoğunluk Analizi" if lang == "tr" else "Silent Majority Analysis", "İzlenme, beğeni ve yorum oranları üzerinden katılım eşitsizliği modelleniyor..." if lang == "tr" else "Modeling participation inequality based on views, likes and comments...")
+        sessiz_cogunluk = analiz_et_sessiz_cogunluk(
+            meta.get("views"), 
+            meta.get("likes"), 
+            meta.get("comment_count", len(yorumlar)), 
+            lang=lang
+        )
+
+        # Siber-Topluluk Türünün Otomatik Tespiti
+        self.log_action("Saha Tipolojisi Tespiti" if lang == "tr" else "Field Typology Detection", "Yorum kelimelerine göre topluluk türü analiz ediliyor..." if lang == "tr" else "Analyzing community type based on comment words...")
         topluluk_turu = topluluk_turu_tespit_et(yorumlar)
-        turu_str = "Genel / Karma Eğitim Topluluğu" if lang == "tr" else "General / Mixed Education Community"
+        lex_info = COMMUNITY_LEXICONS.get(topluluk_turu, {})
+        turu_str = lex_info.get("label_tr" if lang == "tr" else "label_en", "Genel Çevrimiçi Topluluk" if lang == "tr" else "General Online Community")
         
-        self.log_action("Topluluk Türü Saptandı" if lang == "tr" else "Community Type Detected", f"Otomatik saptanan tür: {turu_str}")
+        self.log_action("Saha Türü Saptandı" if lang == "tr" else "Field Type Detected", f"Saptanan topluluk kültürü: {turu_str}")
         
         # Araç 1'in Tetiklenmesi (Duygu ve Kaygı Analizi)
         self.log_action("Araç Tetikleme" if lang == "tr" else "Tool Triggering", f"duygu_ve_kaygi_analizi() çağrılıyor. (Tür: {topluluk_turu})" if lang == "tr" else f"Calling duygu_ve_kaygi_analizi(). (Type: {topluluk_turu})")
@@ -126,7 +146,7 @@ class IklimAynasiAgent:
                 destek_kats = ["Sosyal Destek ve Tesekkur", "Social Support and Gratitude"]
 
                 kaygi_sayisi = sum(1 for r in llm_analysis_results if r.get("category") in kaygi_kats)
-                mentor_sayisi = sum(1 for r in llm_analysis_results if r.get("role") in ["Akran Mentoru", "Peer Mentor"])
+                mentor_sayisi = sum(1 for r in llm_analysis_results if any(m in r.get("role", "") for m in ["Akran Mentoru", "Peer Mentor", "Icerideki", "Insider"]))
                 cosku_sayisi = sum(1 for r in llm_analysis_results if r.get("category") in cosku_kats)
                 hata_sayisi = sum(1 for r in llm_analysis_results if r.get("category") in hata_kats)
                 etik_sayisi = sum(1 for r in llm_analysis_results if r.get("category") in etik_kats)
@@ -140,6 +160,7 @@ class IklimAynasiAgent:
                     "hata": (hata_sayisi / total) * 100 if total > 0 else 0,
                     "etik": (etik_sayisi / total) * 100 if total > 0 else 0,
                     "destek": (destek_sayisi / total) * 100 if total > 0 else 0,
+                    "sessiz_cogunluk": sessiz_cogunluk
                 }
                 
                 saglik_skoru = ((mentor_sayisi + destek_sayisi) / total) * 100 if total > 0 else 0
@@ -179,12 +200,14 @@ class IklimAynasiAgent:
                     rol_sonuclari[rol] = rol_sonuclari.get(rol, 0) + 1
                     
             except Exception as e:
-                self.log_action("LLM Analiz/Raporlama Hatası" if lang == "tr" else "LLM Analysis/Reporting Error", str(e))
-                raise e
+                self.log_action("LLM Analiz/Raporlama Uyarısı" if lang == "tr" else "LLM Analysis Warning", f"{str(e)} - Çevrimdışı moda geçiliyor.")
+                akademik_rapor = izleyici_raporu_olusturucu(duygu_sonuclari, rol_sonuclari, topluluk_turu, sessiz_cogunluk=sessiz_cogunluk)
+                model_info = "Kural Tabanlı Analiz (Çevrimdışı Fallback)" if lang == "tr" else "Rule-Based Analysis (Offline Fallback)"
+                consensus_stats = None
         else:
             # Fallback: Kural Tabanlı Rapor Oluşturucu (Çevrimdışı Mod)
             self.log_action("Araç Tetikleme" if lang == "tr" else "Tool Triggering", "izleyici_raporu_olusturucu() çağrılıyor (Çevrimdışı Mod)..." if lang == "tr" else "Calling izleyici_raporu_olusturucu() (Offline Mode)...")
-            akademik_rapor = izleyici_raporu_olusturucu(duygu_sonuclari, rol_sonuclari, topluluk_turu)
+            akademik_rapor = izleyici_raporu_olusturucu(duygu_sonuclari, rol_sonuclari, topluluk_turu, sessiz_cogunluk=sessiz_cogunluk)
             model_info = "Kural Tabanlı Analiz (Çevrimdışı Fallback)" if lang == "tr" else "Rule-Based Analysis (Offline Fallback)"
             consensus_stats = None
             
@@ -198,7 +221,8 @@ class IklimAynasiAgent:
             "rapor": akademik_rapor,
             "model_info": model_info,
             "llm_results": llm_analysis_results,
-            "consensus_stats": consensus_stats
+            "consensus_stats": consensus_stats,
+            "sessiz_cogunluk": sessiz_cogunluk
         }
 
         

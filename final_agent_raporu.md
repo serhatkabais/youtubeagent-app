@@ -18,26 +18,34 @@ Bu araştırmanın amacı, çevrimiçi informal eğitim içeriklerinin altındak
 
 ## 2. İlgili Çalışmalar ve Kavramsal Çerçeve
 
-### 2.1. Siber-Kültür ve Çevrimiçi İzleyici İklimi
-Sanal topluluklar, fiziksel mekandan bağımsız olarak ortak ilgi alanları etrafında bir araya gelen bireylerin oluşturduğu dinamik yapılardır (Hine, 2015). YouTube gibi platformlar altındaki yorum alanları, sadece basit birer geri bildirim ekranı değil; öğrencilerin birbirlerine teknik destek sunduğu (akran yardımlaşması), ortak kaygılarını paylaştığı ve siber-jargonlar geliştirdiği dijital yaşam alanlarıdır. Topluluk iklimi, bu alanların duygusal tonunu ve sosyal sermayesini (liderlik, mentörlük vb.) tanımlar.
+### 2.1. Siber-Kültür, Dijital Antropoloji ve Çevrimiçi Agoralar
+Sanal topluluklar, fiziksel mekândan bağımsız olarak ortak ilgi alanları ve dijital pratikler etrafında bir araya gelen bireylerin oluşturduğu yaşayan kültürel ekosistemlerdir (Hine, 2015; Miller & Horst, 2012). YouTube gibi platformlar altındaki yorum alanları, geleneksel etnografinin fiziksel saha sahasına (field site) eşdeğer modern birer "dijital agora"dır. Bu alanlar sadece basit birer geri bildirim kutusu değil; katılımcıların birbirlerine teknik destek sunduğu (akran dayanışması), ortak kaygılarını paylaştığı ve siber-jargonlar geliştirdiği dijital yaşam alanlarıdır.
 
-### 2.2. Eğitimde Yapay Zekâ Ajanları ve "Araç Kullanan Ajan" Modeli
-Yapay zekâ ajanları, çevrelerini algılayan, kararlar alan ve belirli amaçlar doğrultusunda araçlar (tools) kullanarak eyleme geçen otonom sistemlerdir (OpenAI, 2024). Eğitimde yapay zekânın kullanımı genellikle doğrudan yönlendirici sohbet robotları (chatbot) ile sınırlandırılsa da, asıl pedagojik değer, öğretmenlerin ve araştırmacıların idari/analitik yükünü hafifleten "karar destek ajanları" tasarlamaktır. 
+### 2.2. Robert Kozinets'in Netnografik Tipolojisi ve Sanal Roller
+Robert Kozinets (2015, 2020), sanal topluluklardaki etkileşimleri ve aidiyet derecelerini dört temel üyelik arketipine ayırır:
+1. **İçeridekiler / Akran Mentörleri (Insiders):** Hem konuya derinlemesine hâkim hem de topluluk içi sosyal bağları güçlü aktörlerdir. Teknik tıkanıklık yaşayan akranlarına gönüllü çözümler, kod parçacıkları ve rehberlik sunarlar.
+2. **Tutkulular / Üretici İzleyiciler (Devotees):** Teknolojiye, araçlara ve bireysel üretim süreçlerine odaklıdırlar; sosyal bağları ikincil plandadır. Kendi iş akışlarını optimize etmeye odaklanırlar.
+3. **Sosyalleşenler (Minglers):** Topluluğun sosyal dokusunu güçlendiren, samimi teşekkür, dayanışma ve aidiyet ifadeleri üreten katılımcılardır.
+4. **Turistler / Pasif İzleyiciler (Tourists):** Tek kelimelik veya emoji içeren, derinleşmemiş periferal gözlemcilerdir (Lave & Wenger, 1991).
 
-Bu çalışmada geliştirilen ajan, yönergedeki "Bileşen Zorunlu Beklentileri" (rol, amaç, araç kullanımı, karar akışı, bellek loglama ve etik sınır) doğrultusunda **Araç Kullanan Agent (Tool-Using Agent)** ve **Karar Destek Ajanı** mimarisine göre tasarlanmıştır. Ajan, topluluktaki yorum jargonu dağılımını ölçmek için metin tabanlı kural ve LLM araçlarını çağırarak pedagojik kararlar üretmektedir.
+### 2.3. Sara Ahmed'in Duygulanım Teorisi (Affect Theory) ve Kolektif Gelecek Kaygısı
+Kültürel duygulanım teorisi (Ahmed, 2004), duyguların bireysel psikolojik durumlardan ziyade toplumsal ağlarda dolaşıma giren, nesnelere yapışan ve kolektif bedenler inşa eden dinamikler olduğunu savunur. Yapay zekâ eğitim videolarının altında biriken "işsiz kalacağız", "yazılımcılık bitti" söylemleri; bireysel bir korku olmanın ötesinde, algoritmik dönüşümün yarattığı **kolektif teknolojik prekarite ve duygulanım iklimi** olarak okunmalıdır.
 
-### 2.3. 12 Kategorili Eğitimsel Nitel Kodlama Taksonomisi
-İzleyicilerin dijital ayak izlerini etnografik olarak kodlamak amacıyla, literatürdeki öğrenme analitiği ve dijital etnografi çalışmalarından (Siemens, 2013) yola çıkılarak 12 kategorili bir taksonomi geliştirilmiştir:
-1. *Heyecan ve Keşif Motivasyonu:* Teknolojik yeniliğe yönelik olumlu saskinlik.
+### 2.4. Clifford Geertz ve Hesaplamalı Yoğun Betimleme (Computational Thick Description)
+Nitel araştırmada Clifford Geertz'in (1973) tanımladığı "yoğun betimleme" (thick description), eylemin salt fiziksel gerçekleşme biçimini değil, ardındaki kültürel bağlamı, niyeti ve retoriği (ironi, kinaye, sarkazm) kavramayı ifade eder. Geleneksel olarak elle yapılan bu analiz, binlerce yorumdan oluşan büyük veri ölçeğinde fiziksel olarak imkânsızdır. Bu çalışmada geliştirilen çoklu Büyük Dil Modeli (Multi-LLM) mutabakatı, büyük veride kültürel alt-metinleri çözerek **hesaplamalı yoğun betimleme köprüsü** kurmaktadır.
+
+### 2.5. 12 Kategorili Siber-Etnografik Kodlama Taksonomisi
+İzleyicilerin dijital ayak izlerini etnografik olarak kodlamak amacıyla, öğrenme analitiği ve dijital etnografi literatüründen yola çıkılarak 12 kategorili bir taksonomi geliştirilmiştir:
+1. *Heyecan ve Keşif Motivasyonu:* Teknolojik yeniliğe yönelik olumlu şaşkınlık ve merak.
 2. *Mesleki Gelecek Kaygısı:* İşsiz kalma ve sektörün yok olması korkusu.
 3. *Etik ve Telif Hassasiyeti:* Emek hırsızlığı ve akademik dürüstlük tartışmaları.
 4. *Teknik Sorun ve Destek Arayışı:* Kodlama hataları ve altyapı tıkanıklıkları.
 5. *Maliyet ve Erişilebilirlik Sorunu:* API faturaları ve ücretli üyelik şikayetleri.
-6. *Sosyal Destek ve Teşekkür:* Topluluk içi aidiyet ve teşekkür metinleri.
+6. *Sosyal Destek ve Teşekkür:* Topluluk içi aidiyet ve minnettarlık metinleri.
 7. *Akran Mentörlüğü ve Yönlendirme:* Diğer kullanıcıların teknik sorunlarına çözüm sunma.
 8. *Yaratıcı İş Akışı Tartışması:* Araçların mevcut üretim süreçlerine entegrasyonu.
 9. *Felsefi/Varoluşsal Sorgulama:* Yapay zekânın bilinci ve insanlığın geleceği üzerine düşünceler.
-10. *İroni, Kinaye veya Sarkastik Yorum:* Ucu açık, alaycı ve satirik eleştiriler.
+10. *İroni, Kinaye veya Sarkastik Yorum:* Alaycı, satirik ve örtük eleştiriler.
 11. *İçerik Talebi ve Öneri:* Gelecek videolar için konu istekleri.
 12. *Genel Gözlem / Yüzeysel Katılım:* Tek kelimelik veya emoji içeren sığ girdiler.
 
@@ -99,28 +107,32 @@ Eğitimciler için bu bulgular, farklı ilgi alanlarına yönelik farklı pedago
 
 ## 7. Etik ve Güvenlik
 Eğitimsel karar destek sistemlerinde yapay zekâ kullanımı, bazı etik ve güvenlik risklerini beraberinde getirir:
-* **Veri Gizliliği:** Çevrimdışı etnografik analizlerde kullanıcıların rızası olmadan verilerinin işlenmesi riski, geliştirdiğimiz iki kademeli (SHA-256 ve regex mentions maskeleme) veri arıtma katmanı ile minimize edilmiştir. Teslim dosyalarına kesinlikle hiçbir gerçek kullanıcı adı veya kişisel veri kaydedilmemiştir.
+* **Veri Gizliliği:** Çevrimdışı etnografik analizlerde kullanıcıların rızası olmadan verilerinin işlenmesi riski, geliştirdiğimiz iki kademeli (SHA-256 ve regex mentions maskeleme) veri arıtma katmanı ile minimize edilmiştir. Araştırma veri tabanına ve dışa aktarılan dosyalara kesinlikle hiçbir gerçek kullanıcı adı veya kişisel veri kaydedilmemiştir.
 * **Model Yanlılığı (Bias):** LLM'ler, eğitildikleri verilerdeki kültürel önyargıları analizlerine yansıtabilirler. Ajanın ürettiği etnografik kodlamalar, topluluğu yanlış etiketleme riski taşır.
 * **Halüsinasyon Riski:** Yapay zekâ modelleri, yorumlardaki ironiyi yanlış yorumlayarak hatalı pedagojik tavsiyeler üretebilir.
-* **İnsan Denetimi (Human-in-the-Loop):** Ajanın kararları nihai birer hüküm değildir. Sistem, öğretmenlerin pedagojik sezgilerinin yerini almayı değil, büyük veri havuzlarını filtreleyerek öğretmene nitel bir "karar desteği" sunmayı amaçlar. Son müdahale kararı her zaman insana aittir.
+* **İnsan Denetimi ve Özdüşünümsellik (Reflexivity):** Ajanın kararları nihai birer hüküm değildir. Sistem, araştırmacının etnografik sezgilerinin yerini almayı değil, büyük veri havuzlarını filtreleyerek araştırmacıya nitel bir "karar desteği" sunmayı amaçlar. Son antropolojik yorumlama kararı her zaman araştırmacıya aittir.
 
 ---
 
 ## 8. Sonuç ve Öneriler
-Bu çalışma, asenkron informal izleme topluluklarının davranış ve duygu iklimlerini saptamada "Araç Kullanan Yapay Zekâ Ajanlarının" güçlü bir analitik araç olarak çalışabileceğini göstermiştir. Geliştirilen "İzleyici İklimi Aynası", kural tabanlı fallback ve LLM entegrasyonu ile hibrit bir güvenilirlik sunmaktadır. 
+Bu çalışma, asenkron informal video topluluklarının siber-kültürel dinamiklerini, duygulanım iklimlerini ve dijital rollerini saptamada "Çoklu LLM Destekli Hesaplamalı Netnografi Ajanlarının" güçlü bir metodolojik araç olarak çalışabileceğini göstermiştir. Geliştirilen "İzleyici İklimi Aynası", kural tabanlı fallback ve LLM entegrasyonu ile hibrit bir güvenilirlik sunmaktadır. 
 
-Gelecek çalışmalarda, tek bir ajanın analizi yerine, farklı uzmanlık alanlarına sahip (Analist, Pedagog, Etik Denetçi) birden fazla ajanın aralarında tartışarak konsensüs sağladığı **Çoklu Ajan Sistemleri (Multi-Agent Systems)** mimarilerinin eğitim analitiğindeki performansı test edilmelidir. Ayrıca, ders izlencesi ve ders dokümanlarının bir RAG (Retrieval-Augmented Generation) veri tabanı olarak sisteme entegre edilmesiyle, önerilen kaynakların doğrudan ders müfredatı ile ilişkilendirilmesi sağlanmalıdır.
+Gelecek çalışmalarda, tek bir dijital sahanın analizi yerine, farklı toplulukların (kodlama vs. tasarım kanalları) dillerini yan yana kıyaslayan **Çok-Sahalı Etnografi (Multi-Sited Ethnography)** modelleri ve boylamsal (longitudinal) zaman analizi modülleri sisteme entegre edilmelidir.
 
 ---
 
 ## Kaynakça
+* Ahmed, S. (2004). *The Cultural Politics of Emotion*. Edinburgh University Press. DOI: https://doi.org/10.4324/9780203700372
+* Geertz, C. (1973). *The Interpretation of Cultures: Selected Essays*. Basic Books. ISBN: 9780465097197
 * Hine, C. (2015). *Ethnography for the Internet: Embedded, embodied and everyday*. Bloomsbury Academic. ISBN: 9780857855701. DOI: https://doi.org/10.4324/9781003085348
-* Kozinets, R. V. (2010). *Netnography: Doing Ethnographic Research Online*. SAGE Publications. ISBN: 9781848606456. DOI: https://doi.org/10.22230/cjc.2013v38n1a2631
+* Kozinets, R. V. (2015). *Netnography: Redefined* (2nd ed.). SAGE Publications. ISBN: 9781446285756
+* Kozinets, R. V. (2020). *Netnography: Unlimited. Understanding Technoculture Using Qualitative Social Media Research*. SAGE Publications. ISBN: 9781526487872
+* Miller, D., & Horst, H. A. (2012). The Digital and the Human: A Prospectus for Digital Anthropology. In H. A. Horst & D. Miller (Eds.), *Digital Anthropology* (pp. 3–35). Berg. DOI: https://doi.org/10.4324/9781003085201
 * Siemens, G. (2013). Learning Analytics: The Emergence of a Discipline. *American Behavioral Scientist*, 57(10), 1380–1400. DOI: https://doi.org/10.1177/0002764213498851
 * Tan, E. (2013). Informal learning on YouTube: exploring digital literacy in independent online learning. *Learning, Media and Technology*, 38(4), 463–477. DOI: https://doi.org/10.1080/17439884.2013.783594
 * Buckingham, D. (2007). Digital Media Literacies: Rethinking Media Education in the Age of the Internet. *Research in Comparative and International Education*, 2(1), 43-55. DOI: https://doi.org/10.2304/rcie.2007.2.1.43
 * Lave, J., & Wenger, E. (1991). *Situated learning: Legitimate peripheral participation*. Cambridge University Press. ISBN: 9780521423748. DOI: https://doi.org/10.1017/CBO9780511815355
-* Anderson, T. (2008). *The Theory and Practice of Online Learning* (2nd ed.). Athabasca University Press. ISBN: 9781897425084. Available at: https://www.aupress.ca/books/120146-the-theory-and-practice-of-online-learning/
+* Anderson, T. (2008). *The Theory and Practice of Online Learning* (2nd ed.). Athabasca University Press.
 * Schroeder, N. L., & Adesope, O. O. (2014). A Systematic Review of Pedagogical Agents' Impact on Learning. *Journal of Educational Computing Research*, 51(3), 329-355. DOI: https://doi.org/10.2190/EC.51.3.e
 
 ---

@@ -1,0 +1,107 @@
+[
+  {
+    "id": 1,
+    "username": "user_4f9a2b1c",
+    "video_title": "Video_L_a3s0ObozI",
+    "comment": "Yazılımcılık bitti artık her şeyi n8n ve yapay zeka ajanları ile hallediyorum. Gençlerin bu alana girmesi büyük risk.",
+    "likes": 42
+  },
+  {
+    "id": 2,
+    "username": "user_8e1d3c9a",
+    "video_title": "Video_L_a3s0ObozI",
+    "comment": "Harika bir eğitim olmuş hocam, sayenizde iş akışımı baştan tasarladım. Emeğinize sağlık!",
+    "likes": 18
+  },
+  {
+    "id": 3,
+    "username": "user_2b7f0e5d",
+    "video_title": "Video_L_a3s0ObozI",
+    "comment": "Çok iyi ya, harika, hepimiz işsiz kaldık desene... 3 ay sonra yapay zeka kahve de yapacakmış.",
+    "likes": 85
+  },
+  {
+    "id": 4,
+    "username": "user_9a4c7e1f",
+    "video_title": "Video_L_a3s0ObozI",
+    "comment": "Docker ayağa kalkarken port 5678 çakışması alıyorum, .env dosyasında webhook URL'ini nasıl ayarlamalıyım?",
+    "likes": 3
+  },
+  {
+    "id": 5,
+    "username": "user_3c5d8a2b",
+    "video_title": "Video_L_a3s0ObozI",
+    "comment": "@[kullanıcı_maskelendi] docker-compose.yml içinde ports kısmını 5679:5678 olarak değiştirip dene, webhook url için de ngrok kullanırsan yerelde sorunsuz tetiklenir.",
+    "likes": 27
+  },
+  {
+    "id": 6,
+    "username": "user_7a1b9c3e",
+    "video_title": "Video_L_a3s0ObozI",
+    "comment": "Yapay zeka insan bilincini asla taklit edemez. Burada sadece istatistiksel bir token tahmini var, yaratıcılık insana özgüdür.",
+    "likes": 64
+  },
+  {
+    "id": 7,
+    "username": "user_1e8f2a4c",
+    "video_title": "Video_L_a3s0ObozI",
+    "comment": "Claude 3.7 ve Gemini 2.0 modellerini workflow'a dahil ettiğimde API faturası çok şişti. Maliyeti düşürmek için yerel Ollama modellerini bağlayan var mı?",
+    "likes": 31
+  },
+  {
+    "id": 8,
+    "username": "user_6b2e4d9f",
+    "video_title": "Video_L_a3s0ObozI",
+    "comment": "@[kullanıcı_maskelendi] evet ben Qwen 2.5 7B'yi yerel Ollama sunucusuyla HTTP request node'una bağladım. Hız biraz düşük ama sıfır maliyetle çalışıyor tavsiye ederim.",
+    "likes": 19
+  },
+  {
+    "id": 9,
+    "username": "user_5d9c1e7a",
+    "video_title": "Video_L_a3s0ObozI",
+    "comment": "👍 süper",
+    "likes": 1
+  },
+  {
+    "id": 10,
+    "username": "user_0a3b6c8e",
+    "video_title": "Video_L_a3s0ObozI",
+    "comment": "Sanatçıların ve yazarların verilerini izinsiz kazıyıp model eğitmek hırsızlıktır. Bu araçları övenler yarın kendi işleri çalınınca anlayacaklar.",
+    "likes": 53
+  },
+  {
+    "id": 11,
+    "username": "user_4c8a1f2e",
+    "video_title": "Video_L_a3s0ObozI",
+    "comment": "Ben 45 yaşındayım, muhasebeciyim ama bu videoyla ilk otomasyonumu kurdum. Öğrenmenin yaşı yokmuş, çok teşekkür ederim.",
+    "likes": 112
+  },
+  {
+    "id": 12,
+    "username": "user_9f3b5d1a",
+    "video_title": "Video_L_a3s0ObozI",
+    "comment": "Gelecek videoda LangGraph ve Multi-Agent koordinasyonunu da anlatabilir misiniz? Merakla bekliyoruz.",
+    "likes": 24
+  },
+  {
+    "id": 13,
+    "username": "user_2e6a8c4f",
+    "video_title": "Video_L_a3s0ObozI",
+    "comment": "Bunu izleyip kendini mühendis sananlar var ya çok komik :D",
+    "likes": 38
+  },
+  {
+    "id": 14,
+    "username": "user_8d4f0a2c",
+    "video_title": "Video_L_a3s0ObozI",
+    "comment": "Bu ajanı bir Telegram botuna bağlayıp müşterilerin randevularını yönetmesini sağladım, küçük işletmem için devrim oldu!",
+    "likes": 47
+  },
+  {
+    "id": 15,
+    "username": "user_1a7c9e3b",
+    "video_title": "Video_L_a3s0ObozI",
+    "comment": "ilk yorum",
+    "likes": 0
+  }
+]

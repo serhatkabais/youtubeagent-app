@@ -32,10 +32,10 @@ UI_TXT = {
         "agent_id": "Ajan Kimliği",
         "agent_role": "Ajan Rolü",
         "system_instruction": "Sistem Talimatı",
-        "thesis_context": "Tez Bağlamı",
-        "thesis_desc": "Bu çalışma, çevrimiçi/gayriresmi izleyici topluluklarındaki iklimi, jargonları ve izleyici kimliklerini inceleyerek içerik üreticilerine ve araştırmacılara veri tabanlı öneriler sunan bir karar destek aracıdır.",
+        "thesis_context": "Akademik Araştırma ve Tez Bağlamı",
+        "thesis_desc": "Bu çalışma, çevrimiçi gayriresmi izleyici topluluklarındaki (YouTube) siber-kültürel iklimi, dilsel jargonları, kolektif duygulanımı (Sara Ahmed) ve Kozinets'in netnografik rollerini inceleyen hesaplamalı bir dijital antropoloji araştırma platformudur.",
         "ethical_boundary": "Gözetim ve Etik Sınır",
-        "ethical_desc": "<b>Uyarı:</b> Ajan çıktıları kesin yargılar barındırmaz. Eğitim tasarım kararları verilirken insan (öğretmen/araştırmacı) gözetimi zorunludur.",
+        "ethical_desc": "<b>Uyarı:</b> Ajan çıktıları kesin yargılar barındırmaz. Nitel araştırmalarda araştırmacının özdüşünümselliği (reflexivity) ve insan gözetimi esastır.",
         "api_settings": "🔌 Yapay Zekâ API Ayarları",
         "api_status": "Sistemdeki API Durumları:",
         "configured": "Yapılandırıldı",
@@ -52,15 +52,16 @@ UI_TXT = {
         "conn_err": "bağlantı hatası:",
         "all_tests_passed": "🏆 Tüm model bağlantı testleri başarıyla tamamlandı!",
         "main_title": "İzleyici İklimi Aynası",
-        "main_subtitle": "Sanal İzleyici Topluluklarındaki Jargon, Duygu ve Akran Kültürü Çözümleyicisi",
-        "tab_home": "🏠 Ana Sayfa",
-        "tab_analysis": "🔴 📊 ANALİZ PANELİ (Buradan Başlatın) 👈",
-        "tab_logs": "🪵 Ajan İşlem Günlüğü (Logs)",
-        "purpose": "🎯 Projenin Amacı ve Kapsamı",
-        "purpose_desc": "Bu proje, asenkron ve gayriresmi video izleme platformlarındaki kültürel iklimi ve dil örüntülerini analiz eder. Sistemimiz, izleyicilerin yapay zekâ okuryazarlığı düzeylerini, gelecek kaygılarını, teknik entegrasyon bariyerlerini ve akran yardımlaşma kültürlerini çözümleyerek içerik üreticileri ve araştırmacılara şu katkıları sunar:\n\n- **İklim Analizi:** Topluluk dilini tarayarak grubun 'yaratıcı/estetik' mi, 'teknik/otomasyon' odaklı mı olduğunu otomatik olarak belirler.\n- **Kişiselleştirilmiş İzleyici Önerileri:** Hem topluluğun geneline yönelik tavsiyeler üretir, hem de tek tek her bir yorum için özel izleyici odaklı yönlendirmeler geliştirir.\n- **Akran Mentörlüğü Tespiti:** Birbirine teknik destek veren akran liderleri saptar.",
-        "how_it_works": "💡 Nasıl Çalışır?",
-        "how_it_works_desc": "1. **Video Bağlantısı Girin:** YouTube videosunun linkini girdiğinizde, sistem anında video künyesini çeker.\n2. **Yorumları Çekin:** 'Tüm Yorumlar' seçeneğiyle tüm havuzu indirebilir veya 'Özel Sayıda Yorum' seçeneğiyle rastgele örneklem oluşturabilirsiniz.\n3. **Toplu ve Tekil Analiz:** Sistem toplu grafikleri ve raporları oluştururken, siz de tekil yorumlar arasında butonlarla gezinebilirsiniz.",
-        "agent_title": "🤖 İzleyici Topluluğu Analiz ve Karar Destek Ajanı",
+        "main_subtitle": "Sanal Topluluklarda Büyük Dil Modelleri Destekli Hesaplamalı Netnografi ve Siber-Antropoloji Platformu",
+        "tab_home": "🏠 Araştırma Bağlamı",
+        "tab_analysis": "🔴 📊 ETNOGRAFİK SAHA ANALİZİ 👈",
+        "tab_fieldnotes": "📓 Araştırmacı Saha Defteri",
+        "tab_logs": "🪵 Ajan Günlüğü & Özdüşünümsellik",
+        "purpose": "🎯 Araştırmanın Amacı ve Kuramsal Kapsamı",
+        "purpose_desc": "Bu araştırma platformu, video paylaşım platformlarındaki asenkron informal etkileşimleri siber-kültürel ve antropolojik bir mercekten inceler. Sistemimiz; Kozinets'in netnografik tipolojisini, Sara Ahmed'in duygulanım teorisini ve Clifford Geertz'in 'yoğun betimleme' ilkesini hesaplamalı büyük dil modelleri ile birleştirerek şu analizleri sunar:\n\n- **Kolektif Duygulanım & İklim:** İzleyicilerin teknolojik prekarite, mesleki kaygı ve keşif coşkusu dağılımını haritalar.\n- **Kozinets Netnografik Rolleri:** Topluluk üyelerini İçeridekiler (Akran Mentörleri), Tutkulular (Üreticiler), Sosyalleşenler ve Turistler olarak sınıflandırır.\n- **Siber-Retorik Çözümleme:** İroni, kinaye ve sarkastik övgü gibi örtük söylemleri çözerek alt-metinleri aydınlatır.",
+        "how_it_works": "💡 Saha Çalışması Metodolojisi",
+        "how_it_works_desc": "1. **Dijital Saha Seçimi:** Hedef YouTube video bağlantısını girin veya arşivlenmiş hazır etnografik veri setini seçin.\n2. **Kriptografik Etik Arıtma:** Sistem, yorumları indirirken kullanıcı adlarını SHA-256 ile anında hash'ler ve @mentions ifadelerini maskeler.\n3. **Çoklu LLM Mutabakatı:** 3 farklı yapay zekâ modeli paralel çalışarak Fleiss' Kappa güvenilirlik indeksiyle etnografik kodlama üretir.\n4. **Saha Notu ve Dışa Aktarma:** Yorumlar arasında gezinirken araştırmacı saha defterine nitel notlar alabilir, tüm matrisi MAXQDA / Excel uyumlu indirebilirsiniz.",
+        "agent_title": "🤖 Hesaplamalı Netnografi ve Siber-Kültür Araştırma Ajanı",
         "control_center": "⚡ Ajan Kontrol Merkezi",
         "control_desc": "Analiz edilecek YouTube videosunu sol sütundan girin/seçin; API sağlayıcısını ve modelini sağ sütundan seçerek alttaki büyük kırmızı butona basın.",
         "target_video": "📺 1. Hedef YouTube Videosu",
@@ -124,8 +125,8 @@ UI_TXT = {
         "raw_consensus": "Mutabakat",
         "raw_confidence": "Güven Skoru",
         "raw_likes": "Beğeni",
-        "logs_title": "### 🪵 Ajan İşlem Günlüğü (Bellek / Karar Geçmişi)",
-        "logs_desc": "Yönergedeki 'En az oturum içi geçmiş veya işlem günlüğü tutulmalıdır' maddesinin kanıtıdır.",
+        "logs_title": "### 🪵 Ajan İşlem Günlüğü (Özdüşünümsellik / Bellek Kayıtları)",
+        "logs_desc": "Dijital etnografik saha günlüğü; ajanın aldığı analitik ve metodolojik kararların özdüşünümsel (reflexive) kayıt defteridir.",
         "original_lang": "Orijinal Dil",
         "translation": "Çeviri"
     },
@@ -135,10 +136,10 @@ UI_TXT = {
         "agent_id": "Agent Identity",
         "agent_role": "Agent Role",
         "system_instruction": "System Instruction",
-        "thesis_context": "Thesis Context",
-        "thesis_desc": "This study is a decision support tool that analyzes the climate, jargon, and viewer identities in online/informal learning audience communities to offer data-backed suggestions to content creators and researchers.",
+        "thesis_context": "Academic Research & Thesis Context",
+        "thesis_desc": "This study is a computational digital anthropology research platform investigating cyber-cultural climates, linguistic jargons, collective affect (Sara Ahmed), and Kozinets' netnographic roles in online video audience communities (YouTube).",
         "ethical_boundary": "Oversight & Ethical Boundaries",
-        "ethical_desc": "<b>Warning:</b> Agent outputs do not constitute absolute judgments. Human (teacher/researcher) oversight is mandatory when making instructional design decisions.",
+        "ethical_desc": "<b>Warning:</b> Automated outputs do not constitute absolute truths. In qualitative research, researcher reflexivity and critical human oversight are paramount.",
         "api_settings": "🔌 AI API Settings",
         "api_status": "System API Statuses:",
         "configured": "Configured",
@@ -155,16 +156,18 @@ UI_TXT = {
         "conn_err": "connection error:",
         "all_tests_passed": "🏆 All model connection tests completed successfully!",
         "main_title": "Audience Climate Mirror",
-        "main_subtitle": "Jargon, Emotion, and Peer Culture Analyzer in Virtual Audience Communities",
-        "tab_home": "🏠 Home Page",
-        "tab_analysis": "🔴 📊 ANALYSIS PANEL (Start Here) 👈",
-        "tab_logs": "🪵 Agent Action Logs",
-        "purpose": "🎯 Project Purpose and Scope",
-        "purpose_desc": "This project analyzes the cultural climate and language patterns on asynchronous and informal video viewing platforms. Our system resolves viewers' AI literacy levels, future anxieties, technical integration barriers, and peer assistance cultures, contributing the following to content creators and researchers:\n\n- **Climate Analysis:** Scans the community language to automatically determine if the group is 'creative/aesthetic' or 'technical/automation' oriented.\n- **Personalized Audience Recommendations:** Generates recommendations for the general community, as well as specific audience-oriented guidance for each individual comment.\n- **Peer Mentorship Detection:** Detects peer leaders providing technical support to each other.",
-        "how_it_works": "💡 How it Works",
-        "how_it_works_desc": "1. **Enter Video Link:** When you enter the YouTube video link, the system instantly fetches the video metadata.\n2. **Fetch Comments:** You can download the entire pool with the 'All Comments' option or create a random sample with the 'Custom Comment Limit' option.\n3. **Aggregated & Individual Analysis:** While the system generates aggregated charts and reports, you can navigate between individual comments using navigation buttons.",
-        "agent_title": "🤖 Audience Community Analysis & Decision Support Agent",
+        "main_subtitle": "Multi-LLM Computational Netnography & Cyber-Anthropology Platform for Virtual Communities",
+        "tab_home": "🏠 Research Context",
+        "tab_analysis": "🔴 📊 ETHNOGRAPHIC FIELDWORK 👈",
+        "tab_fieldnotes": "📓 Field Notes & Reflexivity",
+        "tab_logs": "🪵 Agent Reflexivity Log",
+        "purpose": "🎯 Research Purpose and Theoretical Scope",
+        "purpose_desc": "This research platform examines asynchronous informal interactions on video-sharing platforms through a cyber-cultural and anthropological lens. By combining Kozinets' netnographic typology, Sara Ahmed's affect theory, and Clifford Geertz's 'thick description' with computational Large Language Models, it delivers:\n\n- **Collective Affect & Climate:** Maps distributions of technological precarity, occupational anxiety, and euphoria.\n- **Kozinets Netnographic Roles:** Classifies members into Insiders (Peer Mentors), Devotees (Creators), Minglers (Socializers), and Tourists (Lurkers).\n- **Cyber-Rhetorical Decoding:** Resolves implicit discourse such as irony, innuendo, and sarcastic praise to illuminate subtexts.",
+        "how_it_works": "💡 Fieldwork Methodology",
+        "how_it_works_desc": "1. **Digital Field Selection:** Enter target YouTube link or select preloaded archived ethnographic datasets.\n2. **Cryptographic Ethical Anonymization:** Hashes usernames via SHA-256 and scrubs @mentions upon fetching.\n3. **Multi-LLM Consensus:** 3 distinct models run concurrently to provide Fleiss' Kappa inter-coder reliability.\n4. **Field Notes & Export:** Take ethnographic notes in real-time and export full coding matrices to MAXQDA / Excel (.xlsx).",
+        "agent_title": "🤖 Computational Netnography & Cyber-Culture Research Agent",
         "control_center": "⚡ Agent Control Center",
+        "control_panel": "## 🎛️ Digital Ethnographic Research & Data Collection Console",
         "control_desc": "Enter/select the YouTube video to analyze on the left; select the API provider and model on the right, and click the big red button below.",
         "target_video": "📺 1. Target YouTube Video",
         "video_input_label": "YouTube Video URL or Video ID:",
@@ -228,43 +231,52 @@ UI_TXT = {
         "raw_confidence": "Confidence Score",
         "raw_likes": "Likes",
         "logs_title": "### 🪵 Agent Action Log (Memory / Decision History)",
-        "logs_desc": "Evidence for the instruction 'At least inside-session history or transaction log must be kept'.",
+        "logs_desc": "Digital ethnographic field log; a reflexive record of analytical and algorithmic decisions made by the agent.",
         "original_lang": "Original Language",
-        "translation": "Translation"
+        "translation": "Translation",
+        "silent_majority_title": "👻 Silent Majority & Invisible Audience Analysis (Lurkers & 90-9-1 Rule)",
+        "silent_majority_desc": "Audience participation vitality modeled on view, like, and comment ratios framed by Jakob Nielsen's (2006) Participation Inequality and Nonnecke & Preece's (2000) Lurker Ethnography.",
+        "cvr_label": "Comment-to-View Ratio (CVR)",
+        "lvr_label": "Like-to-View Ratio (LVR)",
+        "lurker_ratio_label": "Silent Audience (Lurker) Ratio",
+        "vitality_typology_label": "Community Vitality Typology",
+        "nielsen_distribution": "Nielsen 90-9-1 Participation Inequality Model",
+        "or_pool_title": "OpenRouter Model Pool Filter:",
+        "or_pool_all": "All (Free First, Then Cheapest to Most Expensive)",
+        "or_pool_free": "Free Models Only ([FREE])",
+        "or_pool_paid": "Paid Models Only (Price Sorted - Cheapest First)"
     }
 }
 
 def format_model_options(models, provider):
     formatted = []
-    if provider == "gemini":
-        free_models = [m for m in models if "flash" in m.lower()]
-        other_models = [m for m in models if "flash" not in m.lower()]
-        for m in free_models:
+    for m in models:
+        # Eğer zaten bir ön ek etiketi varsa ([FREE], [$X.XX/1M], [PRO]), olduğu gibi koru
+        if m.startswith("["):
+            formatted.append(m)
+            continue
+
+        if provider == "gemini":
+            if "flash" in m.lower():
+                formatted.append(f"[FREE] {m}")
+            else:
+                formatted.append(f"[PRO] {m}")
+        elif provider == "groq":
             formatted.append(f"[FREE] {m}")
-        for m in other_models:
-            formatted.append(f"[PRO] {m}")
-    elif provider == "groq":
-        for m in models:
-            formatted.append(f"[FREE] {m}")
-    elif provider == "openrouter":
-        free_models = [m for m in models if m.endswith(":free")]
-        other_models = [m for m in models if not m.endswith(":free")]
-        for m in free_models:
-            formatted.append(f"[FREE] {m}")
-        for m in other_models:
-            formatted.append(f"[PRO] {m}")
-    else:
-        formatted = list(models)
+        elif provider == "openrouter":
+            if m.endswith(":free"):
+                formatted.append(f"[FREE] {m}")
+            else:
+                formatted.append(f"[PRO] {m}")
+        else:
+            formatted.append(m)
     return formatted
 
 def parse_selected_model(option):
     if not option:
         return ""
-    if option.startswith("[FREE] "):
-        return option[7:]
-    if option.startswith("[PRO] "):
-        return option[6:]
-    return option
+    # [FREE], [$0.14/1M], [PRO] vb. tüm etiketleri temizleyip ham model kodunu döner
+    return re.sub(r"^\[.*?\]\s*", "", option).strip()
 
 def get_model_index(model_list, target_model_name):
     for idx, name in enumerate(model_list):
@@ -472,6 +484,8 @@ if "groq_models" not in st.session_state:
     st.session_state.groq_models = []
 if "openrouter_models" not in st.session_state:
     st.session_state.openrouter_models = []
+if "openrouter_models_detailed" not in st.session_state:
+    st.session_state.openrouter_models_detailed = None
 
 from api_client import get_available_gemini_models, get_available_groq_models, get_available_openrouter_models
 
@@ -479,22 +493,59 @@ if gemini_key and not gemini_key.startswith("your_") and len(gemini_key.strip())
     st.session_state.gemini_models = get_available_gemini_models(gemini_key)
 if groq_key and not groq_key.startswith("your_") and len(groq_key.strip()) > 10 and not st.session_state.groq_models:
     st.session_state.groq_models = get_available_groq_models(groq_key)
-if or_key and not or_key.startswith("your_") and len(or_key.strip()) > 10 and not st.session_state.openrouter_models:
-    st.session_state.openrouter_models = get_available_openrouter_models(or_key)
+if or_key and not or_key.startswith("your_") and len(or_key.strip()) > 10 and not st.session_state.openrouter_models_detailed:
+    st.session_state.openrouter_models_detailed = get_available_openrouter_models(or_key, detailed=True)
+    if st.session_state.openrouter_models_detailed:
+        st.session_state.openrouter_models = st.session_state.openrouter_models_detailed.get("all", [])
 
 gemini_fallback = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"]
 groq_fallback = ["llama-3.3-70b-versatile", "llama-3.1-70b-versatile", "mixtral-8x7b-32768", "llama-3.1-8b-instant"]
-or_fallback = [
-    "deepseek/deepseek-chat",
-    "meta-llama/llama-3.3-70b-instruct", 
-    "qwen/qwen-2.5-72b-instruct",
-    "google/gemini-flash-1.5",
-    "meta-llama/llama-3.1-8b-instruct"
+
+or_fallback_free = [
+    "[FREE] meta-llama/llama-3.3-70b-instruct:free",
+    "[FREE] qwen/qwen3-coder:free",
+    "[FREE] google/gemma-4-31b-it:free",
+    "[FREE] meta-llama/llama-3.2-3b-instruct:free"
 ]
+or_fallback_paid = [
+    "[$0.14/1M] deepseek/deepseek-chat",
+    "[$0.15/1M] google/gemini-2.0-flash-001",
+    "[$0.15/1M] openai/gpt-4o-mini",
+    "[$0.40/1M] meta-llama/llama-3.3-70b-instruct",
+    "[$2.50/1M] openai/gpt-4o"
+]
+or_fallback_all = or_fallback_free + or_fallback_paid
+
+# OpenRouter Model Havuzu Filtresi
+st.sidebar.markdown(f"**{UI_TXT[lang]['or_pool_title']}**")
+or_filter_choice = st.sidebar.selectbox(
+    "Filtrele:" if lang == "tr" else "Filter:",
+    [
+        UI_TXT[lang]["or_pool_all"],
+        UI_TXT[lang]["or_pool_free"],
+        UI_TXT[lang]["or_pool_paid"]
+    ],
+    index=0,
+    key="or_pool_filter_choice"
+)
+
+if st.session_state.openrouter_models_detailed:
+    if or_filter_choice == UI_TXT[lang]["or_pool_free"]:
+        or_list = st.session_state.openrouter_models_detailed.get("free", [])
+    elif or_filter_choice == UI_TXT[lang]["or_pool_paid"]:
+        or_list = st.session_state.openrouter_models_detailed.get("paid", [])
+    else:
+        or_list = st.session_state.openrouter_models_detailed.get("all", [])
+else:
+    if or_filter_choice == UI_TXT[lang]["or_pool_free"]:
+        or_list = or_fallback_free
+    elif or_filter_choice == UI_TXT[lang]["or_pool_paid"]:
+        or_list = or_fallback_paid
+    else:
+        or_list = or_fallback_all
 
 gemini_list = st.session_state.gemini_models if st.session_state.gemini_models else gemini_fallback
 groq_list = st.session_state.groq_models if st.session_state.groq_models else groq_fallback
-or_list = st.session_state.openrouter_models if st.session_state.openrouter_models else or_fallback
 
 gemini_formatted = format_model_options(gemini_list, "gemini")
 groq_formatted = format_model_options(groq_list, "groq")
@@ -623,9 +674,10 @@ st.markdown(f"<div class='main-title'>{UI_TXT[lang]['main_title']}</div>", unsaf
 st.markdown(f"<div class='sub-title'>{UI_TXT[lang]['main_subtitle']}</div>", unsafe_allow_html=True)
 
 # Sekmelerin Oluşturulması
-tab_intro, tab_analiz, tab_loglar = st.tabs([
+tab_intro, tab_analiz, tab_sahanotu, tab_loglar = st.tabs([
     UI_TXT[lang]["tab_home"], 
     UI_TXT[lang]["tab_analysis"], 
+    UI_TXT[lang]["tab_fieldnotes"],
     UI_TXT[lang]["tab_logs"]
 ])
 
@@ -668,27 +720,60 @@ with tab_analiz:
     with col_left:
         st.markdown(f"### {UI_TXT[lang]['target_video']}")
         
-        youtube_url = st.text_input(
-            UI_TXT[lang]["video_input_label"], 
-            value=f"https://www.youtube.com/watch?v={st.session_state.video_id}" if len(st.session_state.video_id) == 11 else st.session_state.video_id,
-            placeholder="Örn: https://www.youtube.com/watch?v=HK6y8DAPN_0"
+        data_source_mode = st.radio(
+            "Saha Veri Kaynağı:" if lang == "tr" else "Field Data Source:",
+            ["Canlı YouTube Sahası (URL ile Çek)" if lang == "tr" else "Live YouTube Field (Fetch via URL)",
+             "Arşivlenmiş Etnografik Saha Verisi (data/ornek_yorumlar.json)" if lang == "tr" else "Archived Ethnographic Field Dataset (data/ornek_yorumlar.json)"],
+            index=0
         )
         
-        btn_get_meta = st.button(UI_TXT[lang]["btn_meta"], use_container_width=True)
-        
-        if (youtube_url and btn_get_meta) or btn_get_meta:
-            if youtube_url:
-                video_id_match = re.search(r'(?:v=|\/)([0-9A-Za-z_-]{11}).*', youtube_url)
-                video_id = video_id_match.group(1) if video_id_match else youtube_url.strip()
-                
-                with st.spinner(UI_TXT[lang]["fetching_meta"]):
-                    meta = video_kunyesi_uret(video_id)
-                    st.session_state.video_metadata = meta
-                    st.session_state.video_id = video_id
-                    st.session_state.comments_data = []
+        if data_source_mode.startswith("Arşiv" if lang == "tr" else "Archived"):
+            if st.button("📂 Arşivlenmiş Saha Verisini Yükle (15 Yorum)" if lang == "tr" else "📂 Load Archived Fieldwork Data (15 Comments)", use_container_width=True):
+                try:
+                    with open("data/ornek_yorumlar.json", "r", encoding="utf-8") as f:
+                        sample_comments = json.load(f)
+                    st.session_state.comments_data = sample_comments
+                    st.session_state.video_metadata = {
+                        "title": "Yapay Zeka Ajanları ve Otomasyonun Geleceği [Arşiv Saha Çalışması]",
+                        "uploader": "Teknoloji & Siber-Kültür Laboratuvarı",
+                        "views": "142,500",
+                        "likes": "4,820",
+                        "comment_count": "15 (Nitel Etnografik Örneklem)",
+                        "upload_date": "15.01.2026",
+                        "thumbnail": "https://img.youtube.com/vi/L_a3s0ObozI/maxresdefault.jpg",
+                        "url": "https://www.youtube.com/watch?v=L_a3s0ObozI"
+                    }
+                    st.session_state.video_id = "L_a3s0ObozI"
                     st.session_state.analysis_result = None
                     st.session_state.comment_index = 0
+                    st.session_state.is_sample_mode = True
+                    st.success("Örnek etnografik veri yüklendi! Sağ panelden analizi başlatabilirsiniz." if lang == "tr" else "Sample ethnographic dataset loaded! Start analysis from the right panel.")
                     st.rerun()
+                except Exception as e:
+                    st.error(f"Veri yüklenemedi: {e}")
+        else:
+            st.session_state.is_sample_mode = False
+            youtube_url = st.text_input(
+                UI_TXT[lang]["video_input_label"], 
+                value=f"https://www.youtube.com/watch?v={st.session_state.video_id}" if len(st.session_state.video_id) == 11 else st.session_state.video_id,
+                placeholder="Örn: https://www.youtube.com/watch?v=HK6y8DAPN_0"
+            )
+            
+            btn_get_meta = st.button(UI_TXT[lang]["btn_meta"], use_container_width=True)
+            
+            if (youtube_url and btn_get_meta) or btn_get_meta:
+                if youtube_url:
+                    video_id_match = re.search(r'(?:v=|\/)([0-9A-Za-z_-]{11}).*', youtube_url)
+                    video_id = video_id_match.group(1) if video_id_match else youtube_url.strip()
+                    
+                    with st.spinner(UI_TXT[lang]["fetching_meta"]):
+                        meta = video_kunyesi_uret(video_id)
+                        st.session_state.video_metadata = meta
+                        st.session_state.video_id = video_id
+                        st.session_state.comments_data = []
+                        st.session_state.analysis_result = None
+                        st.session_state.comment_index = 0
+                        st.rerun()
 
         # Künye Gösterim Kartı
         if st.session_state.video_metadata:
@@ -699,6 +784,17 @@ with tab_analiz:
             st.markdown(f"👤 {UI_TXT[lang]['channel']}: `{meta['uploader']}`")
             st.markdown(f"👀 {UI_TXT[lang]['views']}: `{meta['views']}` | 👍 {UI_TXT[lang]['likes']}: `{meta.get('likes', 'Bilinmiyor' if lang == 'tr' else 'Unknown')}`")
             st.markdown(f"💬 {UI_TXT[lang]['total_comments']}: `{meta.get('comment_count', 'Bilinmiyor' if lang == 'tr' else 'Unknown')}`")
+            
+            # Hızlı Sessiz Çoğunluk Özeti (Lurkers & Vitality)
+            from tools import analiz_et_sessiz_cogunluk
+            quick_sc = analiz_et_sessiz_cogunluk(meta.get("views"), meta.get("likes"), meta.get("comment_count"), lang=lang)
+            if quick_sc["views"] > 0:
+                st.markdown(f"""
+                <div style='margin-top: 10px; padding: 10px 12px; background: #FAF9F6; border-left: 3px solid {quick_sc["badge_color"]}; font-size: 0.85rem;'>
+                    <b>👻 {UI_TXT[lang]['vitality_typology_label']}:</b> <span style='color:{quick_sc["badge_color"]}; font-weight: bold;'>{quick_sc["tipoloji_baslik"]}</span><br/>
+                    <span style='color: #555;'>CVR (Yorum/İzlenme): <b>%{quick_sc["cvr"]:.3f}</b> | Lurker (Sessiz Kitle): <b>%{quick_sc["lurker_ratio"]:.1f}</b></span>
+                </div>
+                """, unsafe_allow_html=True)
             st.markdown("</div>", unsafe_allow_html=True)
             
     with col_right:
@@ -751,8 +847,11 @@ with tab_analiz:
         
         if st.button(UI_TXT[lang]["btn_analyze"], type="primary", use_container_width=True, disabled=btn_disabled):
             with st.spinner(UI_TXT[lang]["fetching_comments"]):
-                limit = 500
-                raw_comments = download_live_comments(st.session_state.video_id, limit)
+                if st.session_state.get("is_sample_mode") and st.session_state.comments_data:
+                    raw_comments = st.session_state.comments_data
+                else:
+                    limit = 500
+                    raw_comments = download_live_comments(st.session_state.video_id, limit)
                 
                 if raw_comments:
                     if not download_mode.startswith("Tüm Yorumlar" if lang == "tr" else "All Comments") and len(raw_comments) > custom_count:
@@ -844,6 +943,67 @@ with tab_analiz:
                         <span style='font-size:1.4rem; font-weight:bold; color:#2B6CB0;'>{c_stats['fleiss_kappa_role']}</span><br/>
                         <span style='font-size:0.75rem; color:#555;'>{c_stats['fleiss_kappa_role_text']}</span>
                     </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        # Sessiz Çoğunluk & Katılım Eşitsizliği (Lurkers & 90-9-1) Kartı
+        sc = analysis.get("sessiz_cogunluk")
+        if not sc and st.session_state.video_metadata:
+            from tools import analiz_et_sessiz_cogunluk
+            sc = analiz_et_sessiz_cogunluk(
+                st.session_state.video_metadata.get("views"), 
+                st.session_state.video_metadata.get("likes"), 
+                st.session_state.video_metadata.get("comment_count", len(comments)), 
+                lang=lang
+            )
+
+        if sc and sc.get("views", 0) > 0:
+            st.markdown(f"""
+            <div class='premium-card' style='border-left: 5px solid {sc["badge_color"]}; background-color: #FAF9F6; padding: 1.5rem; margin-bottom: 1.5rem;'>
+                <div style='display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;'>
+                    <h3 style='margin: 0; color: #111111; font-family: "Playfair Display", serif;'>{UI_TXT[lang]['silent_majority_title']}</h3>
+                    <span style='background: {sc["badge_color"]}; color: white; padding: 4px 12px; border-radius: 4px; font-weight: bold; font-size: 0.85rem;'>{sc["tipoloji_baslik"]}</span>
+                </div>
+                <p style='margin: 8px 0 15px 0; font-size: 0.9rem; color: #555555;'>
+                    {UI_TXT[lang]['silent_majority_desc']}
+                </p>
+                <div style='display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 15px;'>
+                    <div style='flex: 1; min-width: 140px; background: white; padding: 12px; border: 1px solid #D5CDB5;'>
+                        <span style='font-size:0.8rem; color:#666;'>👀 {UI_TXT[lang]['views']}</span><br/>
+                        <span style='font-size:1.5rem; font-weight:bold; color:#111111;'>{sc["views"]:,}</span>
+                    </div>
+                    <div style='flex: 1; min-width: 140px; background: white; padding: 12px; border: 1px solid #D5CDB5;'>
+                        <span style='font-size:0.8rem; color:#666;'>💬 {UI_TXT[lang]['cvr_label']}</span><br/>
+                        <span style='font-size:1.5rem; font-weight:bold; color:#2B6CB0;'>%{sc["cvr"]:.3f}</span><br/>
+                        <span style='font-size:0.75rem; color:#777;'>({sc["comments"]:,} / {sc["views"]:,})</span>
+                    </div>
+                    <div style='flex: 1; min-width: 140px; background: white; padding: 12px; border: 1px solid #D5CDB5;'>
+                        <span style='font-size:0.8rem; color:#666;'>👍 {UI_TXT[lang]['lvr_label']}</span><br/>
+                        <span style='font-size:1.5rem; font-weight:bold; color:#2E7D32;'>%{sc["lvr"]:.3f}</span><br/>
+                        <span style='font-size:0.75rem; color:#777;'>({sc["likes"]:,} / {sc["views"]:,})</span>
+                    </div>
+                    <div style='flex: 1; min-width: 140px; background: white; padding: 12px; border: 1px solid #D5CDB5;'>
+                        <span style='font-size:0.8rem; color:#666;'>🤫 {UI_TXT[lang]['lurker_ratio_label']}</span><br/>
+                        <span style='font-size:1.5rem; font-weight:bold; color:#8B0000;'>%{sc["lurker_ratio"]:.2f}</span><br/>
+                        <span style='font-size:0.75rem; color:#777;'>Görünmez Kitle</span>
+                    </div>
+                </div>
+                <div style='background: white; padding: 12px 16px; border: 1px solid #D5CDB5; margin-bottom: 12px;'>
+                    <b style='font-size: 0.9rem;'>📊 {UI_TXT[lang]['nielsen_distribution']} (Jakob Nielsen, 2006):</b><br/>
+                    <div style='display: flex; height: 16px; width: 100%; border-radius: 3px; overflow: hidden; margin: 8px 0;'>
+                        <div style='background: #8B0000; width: {max(sc["nielsen"]["lurkers_pct"], 1.0)}%;' title='Sessiz İzleyiciler (Lurkers): %{sc["nielsen"]["lurkers_pct"]}'></div>
+                        <div style='background: #2E7D32; width: {max(sc["nielsen"]["intermittent_pct"], 1.0)}%;' title='Hafif Katılımcılar (Beğenenler): %{sc["nielsen"]["intermittent_pct"]}'></div>
+                        <div style='background: #2B6CB0; width: {max(sc["nielsen"]["creators_pct"], 1.0)}%;' title='Aktif Yorumcular: %{sc["nielsen"]["creators_pct"]}'></div>
+                    </div>
+                    <div style='display: flex; justify-content: space-between; font-size: 0.8rem; color: #444;'>
+                        <span>🤫 <b>Sessiz İzleyici (Lurker):</b> %{sc["nielsen"]["lurkers_pct"]}</span>
+                        <span>👍 <b>Hafif Katılımcı:</b> %{sc["nielsen"]["intermittent_pct"]}</span>
+                        <span>💬 <b>Aktif Üretici/Yorumcu:</b> %{sc["nielsen"]["creators_pct"]}</span>
+                    </div>
+                </div>
+                <div style='font-size: 0.9rem; color: #222; line-height: 1.5; padding: 10px 14px; background: white; border-left: 3px solid #666;'>
+                    <b>🔍 Etnografik & Antropolojik Okuma:</b> {sc["aciklama"]}
                 </div>
             </div>
             """, unsafe_allow_html=True)
@@ -1042,9 +1202,66 @@ with tab_analiz:
                     UI_TXT[lang]["raw_confidence"]: conf,
                     UI_TXT[lang]["raw_likes"]: item.get("likes", 0)
                 })
-            st.dataframe(pd.DataFrame(detailed_table), use_container_width=True)
+            
+            df_export = pd.DataFrame(detailed_table)
+            st.dataframe(df_export, use_container_width=True)
+            
+            # Excel & CSV Export Butonları
+            import io
+            excel_buffer = io.BytesIO()
+            with pd.ExcelWriter(excel_buffer, engine="openpyxl") as writer:
+                df_export.to_excel(writer, sheet_name="Etnografik_Kodlama", index=False)
+            
+            col_exp1, col_exp2 = st.columns(2)
+            col_exp1.download_button(
+                label="📊 MAXQDA / Excel Kodlama Matrisini İndir (.xlsx)" if lang == "tr" else "📊 Download MAXQDA / Excel Matrix (.xlsx)",
+                data=excel_buffer.getvalue(),
+                file_name=f"etnografi_matrisi_{st.session_state.video_id}.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                use_container_width=True
+            )
+            col_exp2.download_button(
+                label="📄 CSV Kodlama Matrisini İndir (.csv)" if lang == "tr" else "📄 Download CSV Matrix (.csv)",
+                data=df_export.to_csv(index=False).encode('utf-8-sig'),
+                file_name=f"etnografi_matrisi_{st.session_state.video_id}.csv",
+                mime="text/csv",
+                use_container_width=True
+            )
 
-# ----------------- TAB 3: BELLEK VE LOG KAYITLARI -----------------
+# ----------------- TAB 3: ARAŞTIRMACI SAHA DEFTERİ (FIELD NOTES) -----------------
+with tab_sahanotu:
+    st.markdown("### 📓 Etnografik Saha Defteri ve Araştırmacı Özdüşünümselliği (Reflexivity)")
+    st.caption(
+        "Kozinets (2015) ve Christine Hine'a (2015) göre dijital etnografide araştırmacının sahaya dair kişisel "
+        "gözlemleri, metodolojik şüpheleri ve sezgileri en az algoritmik veri kadar değerlidir." if lang == "tr" else
+        "According to Kozinets (2015) and Christine Hine (2015), the ethnographer's personal reflections, methodological "
+        "doubts, and insights are just as essential as the computational data."
+    )
+    
+    if "field_notes" not in st.session_state:
+        st.session_state.field_notes = ""
+        
+    saved_note = st.text_area(
+        "Saha Gözlem ve Özdüşünümsellik Notlarınız:" if lang == "tr" else "Fieldwork & Reflexivity Notes:",
+        value=st.session_state.field_notes,
+        height=240,
+        placeholder="Örn: Bu dijital sahada izleyicilerin teknolojik gelecek kaygısını mizah ve ironi ile maskelemeye çalıştıklarını gözlemledim..." if lang == "tr" else "E.g., In this digital field, I observed participants masking technological precarity with humor and irony..."
+    )
+    col_fn1, col_fn2 = st.columns(2)
+    if col_fn1.button("💾 Saha Notunu Kaydet" if lang == "tr" else "💾 Save Field Note", use_container_width=True):
+        st.session_state.field_notes = saved_note
+        st.success("Saha notunuz oturuma kaydedildi!" if lang == "tr" else "Field note saved to session!")
+    
+    if st.session_state.field_notes:
+        col_fn2.download_button(
+            "📥 Saha Notlarını İndir (.txt)" if lang == "tr" else "📥 Download Field Notes (.txt)",
+            data=st.session_state.field_notes,
+            file_name=f"etnografik_saha_notlari_{st.session_state.video_id}.txt",
+            mime="text/plain",
+            use_container_width=True
+        )
+
+# ----------------- TAB 4: BELLEK VE LOG KAYITLARI -----------------
 with tab_loglar:
     st.markdown(UI_TXT[lang]["logs_title"])
     st.caption(UI_TXT[lang]["logs_desc"])

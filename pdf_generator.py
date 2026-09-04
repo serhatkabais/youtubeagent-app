@@ -159,7 +159,21 @@ def generate_analysis_pdf(meta, analysis, comments):
         story.append(Paragraph(f"<b>Fleiss' Kappa - Duygu Analizi:</b> {c_stats['fleiss_kappa_sentiment']} ({c_stats['fleiss_kappa_sentiment_text']})", body_style))
         story.append(Paragraph(f"<b>Fleiss' Kappa - Kategori Sınıflandırma:</b> {c_stats['fleiss_kappa_category']} ({c_stats['fleiss_kappa_category_text']})", body_style))
         story.append(Paragraph(f"<b>Fleiss' Kappa - Dijital Rol Tespiti:</b> {c_stats['fleiss_kappa_role']} ({c_stats['fleiss_kappa_role_text']})", body_style))
-    story.append(Spacer(1, 5))
+        story.append(Spacer(1, 5))
+
+    # Sessiz Çoğunluk & Katılım Eşitsizliği (90-9-1) Analizi
+    sc = analysis.get("sessiz_cogunluk")
+    if not sc and meta:
+        from tools import analiz_et_sessiz_cogunluk
+        sc = analiz_et_sessiz_cogunluk(meta.get('views'), meta.get('likes'), meta.get('comment_count', len(comments)))
+        
+    if sc:
+        story.append(Paragraph("Sessiz Çoğunluk & Görünmez Kitle (Lurkers & 90-9-1 Kuralı)", h1_style))
+        story.append(Paragraph(f"<b>Topluluk Canlılık Tipolojisi:</b> {escape_html_for_pdf(sc['tipoloji_baslik'])}", body_style))
+        story.append(Paragraph(f"<b>Yorum/İzlenme Oranı (CVR):</b> %{sc['cvr']:.3f} | <b>Beğeni/İzlenme Oranı (LVR):</b> %{sc['lvr']:.3f} | <b>Sessiz İzleyici (Lurker) Oranı:</b> %{sc['lurker_ratio']:.2f}", body_style))
+        story.append(Paragraph(f"<b>Katılım Eşitsizliği (Nielsen Modeli):</b> %{sc['nielsen']['lurkers_pct']} Sessiz İzleyici (Lurkers), %{sc['nielsen']['intermittent_pct']} Hafif Katılımcı (Beğeniler), %{sc['nielsen']['creators_pct']} Aktif Tartışmacı (Yorumlar)", body_style))
+        story.append(Paragraph(f"<b>Etnografik Değerlendirme:</b> {escape_html_for_pdf(sc['aciklama'])}", body_style))
+        story.append(Spacer(1, 5))
     
     # Grafiklerin oluşturulması ve PDF'e eklenmesi
     try:

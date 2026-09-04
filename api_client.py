@@ -27,8 +27,9 @@ def test_api_connection(provider, api_key, selected_model=None):
                     return True, selected_model, f"Groq baglantisi basarili! Secilen model: {selected_model}"
                 data = response.json()
                 models = [m["id"] for m in data.get("data", [])]
-                preferred = ["llama-3.3-70b-versatile", "llama-3.1-70b-versatile", "mixtral-8x7b-32768"]
-                selected_model = "llama-3.3-70b-versatile"
+                chat_models = [m for m in models if not m.startswith("whisper") and "guard" not in m]
+                preferred = ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "qwen/qwen3.8-27b", "qwen/qwen3.6-27b", "llama-3.3-70b-versatile"]
+                selected_model = chat_models[0] if chat_models else (models[0] if models else "openai/gpt-oss-120b")
                 for p in preferred:
                     if p in models:
                         selected_model = p
@@ -287,14 +288,13 @@ Asagidaki 12 kategoriden EN UYGUN olanini sec:
 - "Icerik Talebi ve Oneri": "Sunu da anlatsaniz", "devami gelsin", video onerisi
 - "Genel Gozlem / Yuzeysel Katilim": Kisa, baglamsiz veya yuzeysel yorumlar ("ilk yorum", emoji)
 
-### 4. Topluluk Rolu (role)
-- "Akran Mentoru": Baskasina cevap veren, kaynak paylasan, cozum oneren
-- "Profesyonel Uygulayici": Kendi is akisindan bahseden, deneyim paylasan
-- "Elestirel Dusunur": Etik/felsefi sorgulayan, karsi arguman sunan
-- "Yeni Kesfeci / Merakli": Denemeye hevesli, kesfetmek isteyen, sorular soran
-- "Hayal Kirikligi": Teknik engelle karsilasanlar, maliyet sikayetcisi
-- "Pasif Destekci": Kisa tesekkur/takdir, yuzeysel katilim
-- "Ironik Gozlemci": Alayci/sarkastik perspektifle yorum yapan
+### 4. Etnografik Topluluk Rolu (role - Kozinets Netnografik Tipolojisi)
+- "Icerideki / Akran Mentoru": Baskasina cevap veren, kaynak paylasan, teknik/pedagojik cozum oneren (Kozinets Insider)
+- "Tutkulu / Uretici Izleyici": Kendi is akisindan bahseden, teknolojiye ve uretime odakli, arac deneyen (Kozinets Devotee)
+- "Elestirel Dusunur": Etik/felsefi boyutlari sorgulayan, karsi arguman ve alternatif perspektif sunan
+- "Sosyallesen / Topluluk Destekcisi": Topluluk aidiyeti gosteren, samimi tesekkur eden, duygusal bag kuran (Kozinets Mingler)
+- "Turist / Pasif Destekci": Kisa takdir, tek kelimelik veya emoji iceren yuzeysel periferal katilim (Kozinets Tourist)
+- "Ironik Gozlemci": Alayci/sarkastik veya kinayeli perspektifle elestiren
 
 ### 5. Retorik Cihaz Algilama (rhetorical_devices)
 Varsa su araclari tespit et:
@@ -539,7 +539,11 @@ def get_llm_report(meta, statistics, comments_sample, provider, api_key, model, 
 
         if lang == "tr":
             prompt = f"Asagidaki YouTube videosu altindaki {statistics.get('total')} yorumun yapay zeka destekli derinlemesine analizini sentezleyerek akademik tonda Turkce bir rapor yaz.\n\n"
-            prompt += f"## VIDEO BILGILERI\n- Baslik: {meta.get('title')}\n- Yayinci: {meta.get('uploader')}\n- Izlenme: {meta.get('views')}\n\n"
+            prompt += f"## VIDEO BILGILERI\n- Baslik: {meta.get('title')}\n- Yayinci: {meta.get('uploader')}\n- Izlenme: {meta.get('views')}\n"
+            if statistics.get("sessiz_cogunluk"):
+                sc = statistics["sessiz_cogunluk"]
+                prompt += f"- Yorum/İzlenme Oranı (CVR): %{sc.get('cvr')}\n- Beğeni/İzlenme Oranı (LVR): %{sc.get('lvr')}\n- Sessiz Kitle (Lurker) Oranı: %{sc.get('lurker_ratio')}\n- Topluluk Canlılık Tipolojisi: {sc.get('tipoloji_baslik')}\n"
+            prompt += "\n"
             prompt += f"## LLM ANALIZ SONUCLARI\n\n### Duygu Dagilimi:\n{json.dumps(sentiment_dist, ensure_ascii=False, indent=2)}\n\n"
             prompt += f"### Kategori Dagilimi:\n{json.dumps(category_dist, ensure_ascii=False, indent=2)}\n\n"
             prompt += f"### Topluluk Rolu Dagilimi:\n{json.dumps(role_dist, ensure_ascii=False, indent=2)}\n\n"
@@ -568,6 +572,9 @@ Lutfen bu verileri sentezleyerek su basliklari iceren zengin, derinlemesine, aka
 ### Topluluk Profili ve Genel Duygu Haritasi
 Duygu dagilimini yorumla. Pozitif/negatif/karisik oranlarini degerlendir. Toplulugun genel atmosferini tanimla.
 
+### Görünmez Kitle ve Katılım Eşitsizliği (Sessiz Çoğunluk / Lurkers & 90-9-1 Kuralı)
+İzlenme, beğeni ve yorum oranlarını (CVR/LVR), Nielsen'in 90-9-1 katılım eşitsizliği ve Nonnecke & Preece'in Lurker kuramı çerçevesinde yorumla. Topluluktaki sessiz çoğunluğun bilişsel rolünü (Lave & Wenger meşru çevresel katılım) açıkla.
+
 ### Tematik Analiz ve Kategori Degerlendirmesi
 Hangi temalar baskin? Kategori dagiliminden ne tur bir topluluk profili cikiyor? Baskin kaygilar ve motivasyonlar neler?
 
@@ -585,7 +592,11 @@ En sona su etik uyariyi ekle:
 """
         else:
             prompt = f"Write an academic, deep qualitative ethnographic synthesis report in English, analyzing the {statistics.get('total')} YouTube comments under the video described below.\n\n"
-            prompt += f"## VIDEO METADATA\n- Title: {meta.get('title')}\n- Publisher: {meta.get('uploader')}\n- Views: {meta.get('views')}\n\n"
+            prompt += f"## VIDEO METADATA\n- Title: {meta.get('title')}\n- Publisher: {meta.get('uploader')}\n- Views: {meta.get('views')}\n"
+            if statistics.get("sessiz_cogunluk"):
+                sc = statistics["sessiz_cogunluk"]
+                prompt += f"- Comment-to-View Ratio (CVR): %{sc.get('cvr')}\n- Like-to-View Ratio (LVR): %{sc.get('lvr')}\n- Silent Audience (Lurker) Ratio: %{sc.get('lurker_ratio')}\n- Community Vitality Typology: {sc.get('tipoloji_baslik')}\n"
+            prompt += "\n"
             prompt += f"## LLM ANALYSIS STATISTICS\n\n### Sentiment Distribution:\n{json.dumps(sentiment_dist, ensure_ascii=False, indent=2)}\n\n"
             prompt += f"### Category Distribution:\n{json.dumps(category_dist, ensure_ascii=False, indent=2)}\n\n"
             prompt += f"### Community Role Distribution:\n{json.dumps(role_dist, ensure_ascii=False, indent=2)}\n\n"
@@ -614,11 +625,14 @@ Please synthesize this data and write a rich, deep, academic-toned report in Eng
 ### Community Profile and General Emotion Map
 Interpret the sentiment distribution. Evaluate positive/negative/mixed ratios. Describe the general atmosphere of the community.
 
+### The Silent Majority & Participation Inequality (Lurkers & 90-9-1 Rule)
+Interpret the Comment-to-View (CVR) and Like-to-View (LVR) ratios within the framework of Jakob Nielsen's 90-9-1 rule and Nonnecke & Preece's Lurker theory. Explain the legitimate peripheral participation (Lave & Wenger) of the silent audience.
+
 ### Thematic Analysis and Category Evaluation
 Which themes are dominant? What kind of community profile emerges from the category distribution? What are the dominant anxieties and motivations?
 
 ### Rhetorical and Subtext Analysis
-Detail irony, innuendo, and sarcastic comments. How do these rhetorical tools mask the community's true feelings?
+Analyze comments with irony, sarcasm, and implicit subtext in detail. How do these rhetorical devices mask the community's authentic sentiments?
 
 ### Community Dynamics and Role Structure
 What is the peer mentorship rate? Do critical thinkers or passive supporters dominate?
@@ -713,9 +727,15 @@ def get_available_groq_models(api_key):
     return []
 
 
-def get_available_openrouter_models(api_key):
+def get_available_openrouter_models(api_key, detailed=False):
+    """
+    OpenRouter API'sinden anlik modelleri ceker.
+    Ucretsiz modelleri [FREE] etiketiyle, ucretli modelleri ise 1M prompt jetonu basina 
+    USD maliyetine gore en ucuzdan en pahaliya dogru siralayarak dondurur.
+    detailed=True ise {'free': [...], 'paid': [...], 'all': [...]} seklinde yapilandirilmis sozluk doner.
+    """
     if not api_key:
-        return []
+        return {"free": [], "paid": [], "all": []} if detailed else []
     api_key = api_key.strip().strip('"').strip("'")
     try:
         url = "https://openrouter.ai/api/v1/models"
@@ -726,12 +746,48 @@ def get_available_openrouter_models(api_key):
         }
         response = requests.get(url, headers=headers, timeout=10)
         if response.status_code == 200:
-            data = response.json()
-            models = [m["id"] for m in data.get("data", [])]
-            return sorted(models)
+            data = response.json().get("data", [])
+            free_list = []
+            paid_list = []
+            
+            for m in data:
+                mid = m.get("id", "")
+                pricing = m.get("pricing", {}) or {}
+                try:
+                    p_prompt = float(pricing.get("prompt") or 0)
+                    p_comp = float(pricing.get("completion") or 0)
+                except Exception:
+                    p_prompt = 0.0
+                    p_comp = 0.0
+                
+                p_1m = round(p_prompt * 1_000_000, 3)
+                is_free = mid.endswith(":free") or (p_prompt == 0 and p_comp == 0)
+                
+                if is_free:
+                    free_list.append(f"[FREE] {mid}")
+                else:
+                    if p_1m >= 0.01:
+                        price_str = f"${p_1m:.2f}/1M"
+                    elif p_1m > 0:
+                        price_str = f"${p_1m:.3f}/1M"
+                    else:
+                        price_str = "$0.00/1M"
+                    paid_list.append((f"[{price_str}] {mid}", p_1m))
+            
+            free_list.sort()
+            paid_list.sort(key=lambda x: x[1])
+            paid_formatted = [x[0] for x in paid_list]
+            
+            if detailed:
+                return {
+                    "free": free_list,
+                    "paid": paid_formatted,
+                    "all": free_list + paid_formatted
+                }
+            return free_list + paid_formatted
     except Exception as e:
         print(f"Error fetching OpenRouter models: {e}")
-    return []
+    return {"free": [], "paid": [], "all": []} if detailed else []
 
 # ============================================================
 # MULTI-LLM MUTABAKAT VE AKADEMİK GÜVENİLİRLİK (FLEISS' KAPPA)
@@ -932,7 +988,8 @@ def analyze_comments_with_llm_consensus(comments, models_config, progress_callba
     kappa_cat = calculate_fleiss_kappa(ratings_category)
     kappa_role = calculate_fleiss_kappa(ratings_role)
 
-    consensus_count = sum(1 for r in consensus_results if r["consensus_details"]["agreement_level"] in ["Tam Mutabakat", "Çoğunluk Kararı" if lang == "tr" else "Full Consensus", "Majority Decision"])
+    valid_consensus = ["Tam Mutabakat", "Çoğunluk Kararı"] if lang == "tr" else ["Full Consensus", "Majority Decision"]
+    consensus_count = sum(1 for r in consensus_results if r["consensus_details"]["agreement_level"] in valid_consensus)
     consensus_rate = (consensus_count / len(comments)) * 100 if len(comments) > 0 else 0.0
 
     stats = {
