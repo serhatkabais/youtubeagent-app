@@ -33,6 +33,25 @@ def find_firebase_credentials():
     1. FIREBASE_CREDENTIALS ortam değişkeni (dosya yolu veya JSON dizgesi)
     2. Proje kökündeki firebase_credentials.json veya *serviceAccount*.json
     """
+    # 0. Streamlit Secrets kontrolü (Streamlit Community Cloud için)
+    try:
+        import streamlit as st
+        if hasattr(st, "secrets") and "FIREBASE_CREDENTIALS" in st.secrets:
+            sec = st.secrets["FIREBASE_CREDENTIALS"]
+            if isinstance(sec, str):
+                if os.path.exists(sec):
+                    return sec
+                try:
+                    return json.loads(sec)
+                except Exception:
+                    pass
+            elif hasattr(sec, "to_dict"):
+                return sec.to_dict()
+            elif isinstance(sec, dict):
+                return dict(sec)
+    except Exception:
+        pass
+
     env_creds = os.getenv("FIREBASE_CREDENTIALS")
     if env_creds:
         if os.path.exists(env_creds):
