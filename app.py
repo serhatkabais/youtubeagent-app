@@ -534,10 +534,21 @@ with st.sidebar.expander(UI_TXT[lang]["sidebar_expander"], expanded=False):
     )
 st.sidebar.markdown(f"### {UI_TXT[lang]['api_settings']}")
 
-# .env'den anahtarları oku
-groq_key = os.getenv("GROQ_API_KEY")
-or_key = os.getenv("OPENROUTER_API_KEY")
-gemini_key = os.getenv("GEMINI_API_KEY")
+# .env'den veya Streamlit Secrets'tan anahtarları oku
+def _get_secret(key_name):
+    val = os.getenv(key_name)
+    if val:
+        return val
+    try:
+        if hasattr(st, "secrets") and key_name in st.secrets:
+            return str(st.secrets[key_name]).strip()
+    except Exception:
+        pass
+    return None
+
+groq_key = _get_secret("GROQ_API_KEY")
+or_key = _get_secret("OPENROUTER_API_KEY")
+gemini_key = _get_secret("GEMINI_API_KEY")
 
 # API Modellerini Dinamik Olarak Çekme
 if "gemini_models" not in st.session_state:
