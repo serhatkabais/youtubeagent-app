@@ -21,8 +21,6 @@ from database_manager import (
     export_combined_corpus
 )
 
-db_status = init_database()
-
 # Sayfa Yapılandırması (Streamlit gereği ilk çağrı olmalı)
 st.set_page_config(
     page_title="İzleyici İklimi Aynası / Audience Climate Mirror",
@@ -30,6 +28,8 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+db_status = init_database()
 
 # Dil Seçimi / Language Selection
 lang_choice = st.sidebar.radio("Dil / Language 🌐", ["Türkçe", "English"], index=0, horizontal=True)
